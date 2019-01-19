@@ -1,81 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<title>White Board</title>
-        <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="A Collabrative White board">
-    <meta name="author" content="devan">
-		  <style type="text/css">
-      #container { position: relative; }
-      #container{
-        width: 1000px;
-        height: 500px;
-        background-color: #fff;
-        border-radius: 5px;
-      }
-      body{
-        background: rgb(55,55,55) !important;
-      }
-      #imageView { border: 1px solid #000; }
-      #imageTemp { position: absolute; top: 1px; left: 1px; }
-      canvas {
-        border-radius: 5px;
-        cursor: url(../img/pen.png), crosshair;
+
+<head>
+  <meta charset="utf-8">
+  <title>White Board</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A Collabrative White board">
+  <meta name="author" content="devan">
+  <style type="text/css">
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Montserrat', sans-serif;
     }
+
+    html, body, main {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: rgb(55, 55, 55) !important;
+    }
+
+    .globalContainer {
+      width: 100vw;
+      height: 100vh;
+      padding: 0.5rem;
+      display: grid;
+      grid-template-rows: 1fr;
+      grid-template-columns: 1fr 7fr 1fr;
+    }
+
+    .toolsContainer {
+      grid-row-start: 1;
+      grid-row-end: 2;
+      grid-column-start: 1;
+      grid-column-end: 2;
+      padding: 10% 0.5rem;
+    }
+
+    #container {
+      grid-row-start: 1;
+      grid-row-end: 2;
+      grid-column-start: 2;
+      grid-column-end: 3;
+      position: relative;
+      background-color: #fff;
+      border-radius: 5px;
+    }
+
+    #imageView {
+      border: 1px solid #000;
+    }
+
+    #imageTemp {
+      position: absolute;
+      top: 1px;
+      left: 1px;
+    }
+
+    canvas {
+      border-radius: 5px;
+      cursor: url(../img/pen.png), crosshair;
+    }
+
     #text_tool {
-    position: absolute;
-    border: 1px dashed black;
-    outline: 0;
-    z-index:1000 !important;
-    display: none;
-    overflow: hidden;
-    white-space: nowrap;
-}
-.container .btn.btn-sm{
-    background: #06f;
-    box-shadow: 0 3px 0 0 rgba(0, 0, 0, 0.5);
-    color: #fff;
-    outline: none;
-    cursor: pointer;
-    text-shadow: 0 1px #06f;
-    display: inline-block;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    padding: 5px 15px;
-    margin-right: 5px;
-}
-.container .btn.btn-sm:active{
-   background: #06f; 
-}
-label{
-    color: #fff;
-}
-    </style>
-    <!-- Bootstrap -->
-    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+      position: absolute;
+      border: 1px dashed black;
+      outline: 0;
+      z-index: 1000 !important;
+      display: none;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .toolsContainer .btn.btn-sm {
+      background: #06f;
+      box-shadow: 0 3px 0 0 rgba(0, 0, 0, 0.5);
+      color: #fff;
+      outline: none;
+      cursor: pointer;
+      text-shadow: 0 1px #06f;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 15px;
+      margin: 0.5rem auto;
+      width: 100%;
+    }
+
+    .toolsContainer .btn.btn-sm:active {
+      background: #06f;
+    }
+
+    .toolsContainer select {
+      width: 100%;
+    }
+
+    label {
+      color: #fff;
+    }
+    .controlsContainer {
+      grid-column-start: 3;
+      grid-column-end: 4;
+      grid-row-start: 1;
+      grid-row-end: 2;
+      background: rgb(55, 55, 55);
+      padding: 10% 0.5rem;
+      text-align: center;
+    }
     
-	</head>
+    .controlsContainer ul {
+      
+      margin: 1rem 0;
+      padding: 0;
+      width: 100%;
+      text-align: center;
+    }
     
-	<body style="margin-top:30px;">
-	<div class="container">
-    <div class="alert alert-info" style="padding: 10px !important; margin-bottom: 5px; width:88%">
-      <strong>Socket IO &#10084;</strong>  - This is a Multi-Users Drawing board, Open <a class="linkToBoard" style="cursor:pointer; color: #ff002d;" target="_blank">link</a> in another tab or Open in another computer try drawing simultaneously in both. <strong>Cool, isn't ?</strong>
-    </div>
-        <p style="">
-        <button type="button" class="btn btn-warning btn-sm" value="pencil" id="pencil-button">Pencil</button>
-        <button type="button" class="btn btn-warning btn-sm" value="rect" id="rect-button">Rectangle</button>
-        <button type="button" class="btn btn-warning btn-sm" value="circle" id="circle-button">Circle</button>
-        <button type="button" class="btn btn-warning btn-sm" value="ellipse" id="ellipse-button">Ellipse</button>
-        <button type="button" class="btn btn-warning btn-sm" value="line" id="line-button">Line</button>
-        <button type="button" class="btn btn-warning btn-sm" value="text" id="text-button">Text</button>
-        <button type="button" class="btn btn-warning btn-sm" id="clear-all">Clear All</button>
-        <label for="colour" style="position:absolute;">Colour : </label>
-        <input id="colour-picker" value="#000000" style="width:80px;" class="jscolor {width:243, height:150, position:'right',
+    .controlsContainer .control {
+      list-style: none;
+      display: block;
+      margin: 1rem 0;
+    }
+
+    .controlsContainer .control:hover {
+      cursor: pointer;
+    }
+    
+    .controlsContainer .control img {
+      width: 2.5rem;
+      height: 2.5rem;
+      margin: 0.5rem auto;
+      display: block;
+    }
+    .controlsContainer .control span {
+      font-size: 1.5rem;
+      color: white;
+    }
+
+    .controlsContainer video {
+      width: 95%;
+      height: 90px;
+      margin: 1rem auto;
+      border: solid 1px white;
+    }
+    
+
+  </style>
+  <!-- Bootstrap -->
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+
+</head>
+
+<body>
+  <div class="globalContainer">
+    <div class="toolsContainer">
+      <button type="button" class="btn btn-warning btn-sm" value="pencil" id="pencil-button">Pencil</button>
+      <button type="button" class="btn btn-warning btn-sm" value="rect" id="rect-button">Rectangle</button>
+      <button type="button" class="btn btn-warning btn-sm" value="circle" id="circle-button">Circle</button>
+      <button type="button" class="btn btn-warning btn-sm" value="ellipse" id="ellipse-button">Ellipse</button>
+      <button type="button" class="btn btn-warning btn-sm" value="line" id="line-button">Line</button>
+      <button type="button" class="btn btn-warning btn-sm" value="text" id="text-button">Text</button>
+      <button type="button" class="btn btn-warning btn-sm" id="clear-all">Clear All</button>
+      <label for="colour" style="position:absolute;">Colour : </label>
+      <input id="colour-picker" value="#000000" style="width:80px;" class="jscolor {width:243, height:150, position:'right',
     borderColor:'#FFF', insetColor:'#FFF', backgroundColor:'#666'}">
-        <!-- <span class="form-group" style="width: 100px;display: inline-block;">
+      <!-- <span class="form-group" style="width: 100px;display: inline-block;">
               <label for="draw-grid">Grid: </label>
               <select class="form-control" id="draw-grid">
                 <option value="normal">Normal</option>
@@ -84,77 +178,110 @@ label{
                 <option value="nogrid">No Grid</option>
               </select>
         </span> -->
-        <span class="form-group" style="width: 90px;display: inline-block;">
-          <label for="line-Width">Thickness: </label>
-          <select class="form-control" id="line-Width">
-            <option>2</option>
-            <option>4</option>
-            <option>6</option>
-            <option>8</option>
-            <option>10</option>
-            <option>12</option>
-            <option>14</option>
-          </select>
-        </span>
-         <span class="form-group" style="width: 130px;display: inline-block;">
-          <label for="draw-text-font-family">Font: </label>
-          <select class="form-control" id="draw-text-font-family">
-            <option value="Arial">Arial</option>
-            <option value="Verdana" selected>Verdana</option>
-            <option value="Times New Roman">Times New Roman</option>
-            <option value="Courier New">Courier New</option>
-            <option value="serif">serif</option>
-            <option value="sans-serif">sans-serif</option>
-          </select>
-        </span>
-        <span class="form-group" style="width: 90px;display: inline-block;">
-          <label for="draw-text-font-size">Font Size: </label>
-          <select class="form-control" id="draw-text-font-size">
-            <option value="16">16 Px</option>
-            <option value="18">18 Px</option>
-            <option value="20">20 Px</option>
-            <option value="22">22 Px</option>
-            <option value="24">24 Px</option>
-            <option value="26">26 Px</option>
-            <option value="28">28 Px</option>
-            <option value="30">30 Px</option>
-            <option value="32" selected>32 Px</option>
-            <option value="34">34 Px</option>
-            <option value="36">36 Px</option>
-            <option value="38">38 Px</option>
-            <option value="40">40 Px</option>
-          </select>
-        </span>
-        </p>
-
-        <div id="container">
-          <canvas id="imageView" width="1000" height="500">
-            <p>Unfortunately, your browser is currently unsupported by our web
-            application.  We are sorry for the inconvenience. Please use one of the
-            supported browsers listed below, or draw the image you want using an
-            offline tool.</p>
-            <p>Supported browsers: <a href="http://www.opera.com">Opera</a>, <a
-              href="http://www.mozilla.com">Firefox</a>, <a
-              href="http://www.apple.com/safari">Safari</a>, and <a
-              href="http://www.konqueror.org">Konqueror</a>.</p>
-          </canvas>
-        </div>
+      <span class="form-group" style="width: 90px;display: inline-block;">
+        <label for="line-Width">Thickness: </label>
+        <select class="form-control" id="line-Width">
+          <option>2</option>
+          <option>4</option>
+          <option>6</option>
+          <option>8</option>
+          <option>10</option>
+          <option>12</option>
+          <option>14</option>
+        </select>
+      </span>
+      <span class="form-group" style="width: 130px;display: inline-block;">
+        <label for="draw-text-font-family">Font: </label>
+        <select class="form-control" id="draw-text-font-family">
+          <option value="Arial">Arial</option>
+          <option value="Verdana" selected>Verdana</option>
+          <option value="Times New Roman">Times New Roman</option>
+          <option value="Courier New">Courier New</option>
+          <option value="serif">serif</option>
+          <option value="sans-serif">sans-serif</option>
+        </select>
+      </span>
+      <span class="form-group" style="width: 90px;display: inline-block;">
+        <label for="draw-text-font-size">Font Size: </label>
+        <select class="form-control" id="draw-text-font-size">
+          <option value="16">16 Px</option>
+          <option value="18">18 Px</option>
+          <option value="20">20 Px</option>
+          <option value="22">22 Px</option>
+          <option value="24">24 Px</option>
+          <option value="26">26 Px</option>
+          <option value="28">28 Px</option>
+          <option value="30">30 Px</option>
+          <option value="32" selected>32 Px</option>
+          <option value="34">34 Px</option>
+          <option value="36">36 Px</option>
+          <option value="38">38 Px</option>
+          <option value="40">40 Px</option>
+        </select>
+      </span>
     </div>
-    
-<!-- Script files -->
-        <script src='jquery.min.js'></script>
-        <script src="bootstrap/js/bootstrap.min.js"></script>
-        <script src="jscolor/jscolor.min.js"></script>
-        <script src="/socket.io/socket.io.js"></script>
-		 <script src="canvas.js"></script> 
-		<!-- <script src="canvas-backup-latest-v1.js"></script> -->
 
-     <script type="text/javascript">
-      $(document).ready(function(){
-          var board_url = window.location.href;
-          $('.linkToBoard').attr("href",board_url);
-      });
-    </script>
+    <div id="container">
+      <canvas id="imageView" width="1000px" height="700px">
+        <p>Unfortunately, your browser is currently unsupported by our web
+          application. We are sorry for the inconvenience. Please use one of the
+          supported browsers listed below, or draw the image you want using an
+          offline tool.</p>
+        <p>Supported browsers: <a href="http://www.opera.com">Opera</a>, <a href="http://www.mozilla.com">Firefox</a>,
+          <a href="http://www.apple.com/safari">Safari</a>, and <a href="http://www.konqueror.org">Konqueror</a>.</p>
+      </canvas>
+    </div>
+    <div class="controlsContainer">
+        <ul id='controls'>
+            <li class='control'>
+              <img src='./assets/icons/invite.svg'/>
+              <span class='toolText'>Inviter</span>
+            </li>
+            <li class='control'>
+              <img src='./assets/icons/download.svg'/>
+              <span class='toolText'>Télécharger</span>
+            </li>
+            <li class='control'>
+              <img src='./assets/icons/cleaning.svg'/>
+              <span class='toolText'>Effacer</span>
+            </li>
+            <li class='control'>
+              <img src='./assets/icons/file.svg'/>
+              <span class='toolText'>Fichier</span>
+            </li>
+            <li class='control'>
+              <img src='./assets/icons/info.svg'/>
+              <span class='toolText'>Aide</span>
+            </li>
+            <li class='control'>
+              <img src='./assets/icons/microphone.svg'/>
+              <span class='toolText'>Micro On</span>
+            </li>
+            <li class='control'>
+              <img src='./assets/icons/camera.svg'/>
+              <span class='toolText'>Vidéo On</span>
+            </li>
+          </ul>
+          <video autoplay id="remoteVideo"></video>
+          <video autoplay id="localVideo"></video>
+    </div>
+  </div>
 
-	</body>
+  <!-- Script files -->
+  <script src='jquery.min.js'></script>
+  <script src="bootstrap/js/bootstrap.min.js"></script>
+  <script src="jscolor/jscolor.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="canvas.js"></script>
+  <!-- <script src="canvas-backup-latest-v1.js"></script> -->
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      var board_url = window.location.href;
+      $('.linkToBoard').attr("href", board_url);
+    });
+  </script>
+
+</body>
+
 </html>
