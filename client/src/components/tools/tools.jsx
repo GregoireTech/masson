@@ -56,6 +56,8 @@ const tools = (props) => {
                 <option value="40">40 Px</option>
                 </select>
             </span>
+            <button type="button" className="btn btn-warning btn-sm" id="web_rtc_button">WebRTC</button>
+            
         </div>
     );
 };

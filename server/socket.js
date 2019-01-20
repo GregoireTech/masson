@@ -12,6 +12,8 @@ function startIO(app) {
 
 function onConnection(socket) {
 
+    console.log('user connected');
+
     // ON DISCONNECT
     socket.on('disconnect', function () {
         console.log('user disconnected');

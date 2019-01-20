@@ -33,12 +33,28 @@ const controls = (props) => {
 
     let controlItems = controlsList.map((control) => {
         let imgUrl=require(`../../assets/icons/${control.link}.svg`);
-        return(
-            <li key={control.link} className='control' id={control.link} >
-                <img src={imgUrl} alt={control.link}/>
-                <span className='toolText'>{control.name}</span>
-            </li>
-        )    
+        if (control.link === 'camera' ) {
+            return(
+                <li onClick={props.teacher} key={control.link} className='control' id={control.link} >
+                    <img src={imgUrl} alt={control.link}/>
+                    <span className='toolText'>{control.name}</span>
+                </li>
+            );    
+        } else if (control.link === 'microphone') {
+            return(
+                <li onClick={props.student} key={control.link} className='control' id={control.link} >
+                    <img src={imgUrl} alt={control.link}/>
+                    <span className='toolText'>{control.name}</span>
+                </li>
+            );    
+        } else {
+            return(
+                <li key={control.link} className='control' id={control.link} >
+                    <img src={imgUrl} alt={control.link}/>
+                    <span className='toolText'>{control.name}</span>
+                </li>
+            );    
+        }
     });
 
     return(

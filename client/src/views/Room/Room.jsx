@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import './Room.css';
 import {canvas} from '../../assets/JS/canvas';
+import student from '../../assets/JS/student';
+import teacher from '../../assets/JS/teacher';
 
 import Tools from '../../components/tools/tools';
 import Canvas from '../../components/canvas/canvas';
@@ -11,7 +13,8 @@ class Room extends Component {
     state = {
         loaded: false,
         width: null,
-        height: null
+        height: null,
+        roomName: this.props.user
     }
 
     componentDidMount(){
@@ -23,7 +26,14 @@ class Room extends Component {
             height: canvasHeight,
             loaded: true
         });
-        canvas();
+        
+    }
+
+    student(){
+        student();
+    }
+    teacher(){
+        teacher();
     }
 
     render() {
@@ -40,7 +50,7 @@ class Room extends Component {
                     {canvas}
                 </div>
                 }
-                <Controls />
+                <Controls teacher={this.teacher} student={this.student} />
             </div>
         );
     };
