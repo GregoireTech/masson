@@ -1,0 +1,15 @@
+/* 
+#imageView {
+    border: 1px solid #000;
+} */
+
+#imageTemp {
+    position: absolute;
+    top: 1px;
+    left: 1px;
+}
+
+canvas {
+    border-radius: 5px;
+    cursor: url(../../assets/img/pen.png), crosshair;
+}

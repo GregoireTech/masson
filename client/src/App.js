@@ -9,6 +9,7 @@ class App extends Component {
     auth : true,
     room : true
   };
+
   render() {
     let body;
     if (this.state.auth && this.state.room != null) {

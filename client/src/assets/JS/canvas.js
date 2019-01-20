@@ -1,8 +1,9 @@
-'use strict';
 
-(function () {
+export const canvas  = () => {
 
-  var socket = io();
+  const io = require('socket.io-client');
+
+  var socket = io('http://localhost:3001');
   // This object holds the implementation of each drawing tool.
   var tools = {};
   var textarea;
@@ -10,6 +11,15 @@
   var lineWidthPicked;
   var SelectedFontFamily;
   var SelectedFontSize;
+
+
+  function getValue(elName){
+    return document.getElementById(elName).value;
+  }
+
+  function valueChangeListen(elName, callback){
+    document.getElementById(elName).addEventListener('change', callback);
+  };
 
 
   // Keep everything in anonymous function, called on window load.
@@ -42,7 +52,7 @@
         }
 
         // Add the temporary canvas.
-        var container = canvaso.parentNode;
+        var container = document.getElementById('container');
         canvas = document.createElement('canvas');
         if (!canvas) {
           alert('Error: I cannot create a new canvas element!');
@@ -63,34 +73,21 @@
         //tool_select.addEventListener('change', ev_tool_change, false);
 
         //Choose colour picker
-        colorPicked = $("#colour-picker").val();
-
-        $("#colour-picker").change(function () {
-          colorPicked = $("#colour-picker").val();
-        });
+        colorPicked = getValue('colour-picker');
+        valueChangeListen('colour-picker', function(){ colorPicked = getValue('colour-picker')});
 
         //Choose line Width
-        lineWidthPicked = $("#line-Width").val();
-
-        $("#line-Width").change(function () {
-          lineWidthPicked = $("#line-Width").val();
-        });
+        lineWidthPicked = getValue('line-Width');
+        valueChangeListen('line-Width', function(){lineWidthPicked = getValue('line-Width')});
 
         //SelectedFontFamily
-        SelectedFontFamily = $("#draw-text-font-family").val();
-
-        $("#draw-text-font-family").change(function () {
-          SelectedFontFamily = $("#draw-text-font-family").val();
-        })
+        SelectedFontFamily = getValue('draw-text-font-family');
+        valueChangeListen('draw-text-font-family', function(){SelectedFontFamily = getValue('draw-text-font-family')});
 
         //SelectedFontSize
-        SelectedFontSize = $("#draw-text-font-size").val();
-
-        $("#draw-text-font-family").change(function () {
-          SelectedFontSize = $("#draw-text-font-size").val();
-        })
-
-
+        SelectedFontSize = getValue('draw-text-font-size');
+        valueChangeListen('draw-text-font-size', function(){SelectedFontSize= getValue('draw-text-font-size')});
+        
         // Activate the default tool.
         if (tools[tool_default]) {
           tool = new tools[tool_default]();
@@ -103,27 +100,27 @@
           }
         }
 
-        $("#pencil-button").click(function () {
+        document.getElementById("pencil-button").addEventListener('click', function () {
           pic_tool_click(this)
         });
 
-        $("#rect-button").click(function () {
+        document.getElementById("rect-button").addEventListener('click', function () {
           pic_tool_click(this)
         });
 
-        $("#circle-button").click(function () {
+        document.getElementById("circle-button").addEventListener('click', function () {
           pic_tool_click(this)
         });
 
-        $("#ellipse-button").click(function () {
+        document.getElementById("ellipse-button").addEventListener('click', function () {
           pic_tool_click(this)
         });
 
-        $("#line-button").click(function () {
+        document.getElementById("line-button").addEventListener('click', function () {
           pic_tool_click(this)
         });
 
-        $("#text-button").click(function () {
+        document.getElementById("text-button").addEventListener('click', function () {
           pic_tool_click(this)
         });
 
@@ -503,56 +500,56 @@
 
       //The Circle tool
 
-      //Old Circle Function
-      function old_drawCircle(x1, y1, x2, y2, color, linewidth, emit) {
+      //Old Circle Function 
+      // function old_drawCircle(x1, y1, x2, y2, color, linewidth, emit) {
 
-        context.clearRect(0, 0, canvas.width, canvas.height);
+      //   context.clearRect(0, 0, canvas.width, canvas.height);
 
-        var radiusX = (x2 - x1) * 0.5,
-          radiusY = (y2 - y1) * 0.5,
-          centerX = x1 + radiusX,
-          centerY = y1 + radiusY,
-          step = 0.01,
-          a = step,
-          pi2 = Math.PI * 2 - step;
+      //   var radiusX = (x2 - x1) * 0.5,
+      //     radiusY = (y2 - y1) * 0.5,
+      //     centerX = x1 + radiusX,
+      //     centerY = y1 + radiusY,
+      //     step = 0.01,
+      //     a = step,
+      //     pi2 = Math.PI * 2 - step;
 
-        context.beginPath();
-        context.moveTo(centerX + radiusX * Math.cos(0),
-          centerY + radiusY * Math.sin(0));
+      //   context.beginPath();
+      //   context.moveTo(centerX + radiusX * Math.cos(0),
+      //     centerY + radiusY * Math.sin(0));
 
-        for (; a < pi2; a += step) {
-          context.lineTo(centerX + radiusX * Math.cos(a),
-            centerY + radiusY * Math.sin(a));
-        }
+      //   for (; a < pi2; a += step) {
+      //     context.lineTo(centerX + radiusX * Math.cos(a),
+      //       centerY + radiusY * Math.sin(a));
+      //   }
 
-        context.closePath();
-        if (color)
-          context.strokeStyle = "#" + color;
-        else
-          context.strokeStyle = "#" + colorPicked;
-        if (linewidth)
-          context.lineWidth = linewidth;
-        else
-          context.lineWidth = lineWidthPicked;
-        context.stroke();
+      //   context.closePath();
+      //   if (color)
+      //     context.strokeStyle = "#" + color;
+      //   else
+      //     context.strokeStyle = "#" + colorPicked;
+      //   if (linewidth)
+      //     context.lineWidth = linewidth;
+      //   else
+      //     context.lineWidth = lineWidthPicked;
+      //   context.stroke();
 
 
-        if (!emit) {
-          return;
-        }
-        var w = canvaso.width;
-        var h = canvaso.height;
+      //   if (!emit) {
+      //     return;
+      //   }
+      //   var w = canvaso.width;
+      //   var h = canvaso.height;
 
-        socket.emit('circledraw', {
-          x1: x1 / w,
-          y1: y1 / h,
-          x2: x2 / w,
-          y2: y2 / h,
-          color: colorPicked,
-          lineThickness: lineWidthPicked
-        });
+      //   socket.emit('circledraw', {
+      //     x1: x1 / w,
+      //     y1: y1 / h,
+      //     x2: x2 / w,
+      //     y2: y2 / h,
+      //     color: colorPicked,
+      //     lineThickness: lineWidthPicked
+      //   });
 
-      }
+      // }
 
       //New Circle Function
       function drawCircle(x1, y1, x2, y2, color, linewidth, emit) {
@@ -658,14 +655,13 @@
       function drawEllipse(x, y, w, h, color, linewidth, emit) {
 
         context.clearRect(0, 0, canvas.width, canvas.height);
-        var ox, oy, xe, ye, xm, ym;
         var kappa = .5522848;
-        ox = (w / 2) * kappa, // control point offset horizontal
-          oy = (h / 2) * kappa, // control point offset vertical
-          xe = x + w, // x-end
-          ye = y + h, // y-end
-          xm = x + w / 2, // x-middle
-          ym = y + h / 2; // y-middle
+        var ox = (w / 2) * kappa; // control point offset horizontal
+        var oy = (h / 2) * kappa; // control point offset vertical
+        var xe = x + w; // x-end
+        var ye = y + h; // y-end
+        var xm = x + w / 2; // x-middle
+        var ym = y + h / 2; // y-middle
 
         context.beginPath();
         context.moveTo(x, ym);
@@ -758,18 +754,18 @@
 
 
       //Text Tool start
-
+      var textContainer = document.getElementById('container');
       textarea = document.createElement('textarea');
       textarea.id = 'text_tool';
       textarea.focus();
       textarea.className += " form-control";
-      container.appendChild(textarea);
+      textContainer.appendChild(textarea);
 
-      // Text tool's text container for calculating
+      // Text tool's text textCfor calculating
       // lines/chars
       var tmp_txt_ctn = document.createElement('div');
       tmp_txt_ctn.style.display = 'none';
-      container.appendChild(tmp_txt_ctn);
+      textContainer.appendChild(tmp_txt_ctn);
 
 
       var onDrawTextBox = function (ev_x, ev_y, tool_x0, tool_y0) {
@@ -966,7 +962,7 @@
       socket.on('Clearboard', onClearAll);
 
 
-      $("#clear-all").click(function () {
+      document.getElementById("clear-all").addEventListener('click', function () {
         context.clearRect(0, 0, canvas.width, canvas.height);
         contexto.clearRect(0, 0, canvaso.width, canvaso.height);
         clearAll_update(true)
@@ -985,4 +981,4 @@
   //end
 
 
-})();
+};

@@ -34,20 +34,20 @@ const controls = (props) => {
     let controlItems = controlsList.map((control) => {
         let imgUrl=require(`../../assets/icons/${control.link}.svg`);
         return(
-            <li class='control' id={control.link} >
+            <li key={control.link} className='control' id={control.link} >
                 <img src={imgUrl} alt={control.link}/>
-                <span class='toolText'>{control.name}</span>
+                <span className='toolText'>{control.name}</span>
             </li>
         )    
     });
 
     return(
-        <div class="controlsContainer">
+        <div className="controlsContainer">
             <ul id='controls'>
                 {controlItems}
             </ul>
-            <video autoplay id="remoteVideo"></video>
-            <video autoplay id="localVideo"></video>
+            <video autoPlay id="remoteVideo"></video>
+            <video autoPlay id="localVideo"></video>
         </div>
     );
 };
