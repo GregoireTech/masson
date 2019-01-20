@@ -1,25 +1,27 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 
+import Start from './views/start/start';
+import Room from './views/Room/Room';
+
 class App extends Component {
+  state = {
+    auth : true,
+    room : true
+  };
   render() {
+    let body;
+    if (this.state.auth && this.state.room != null) {
+      body = <Room />
+    } else {
+      body = <Start />
+    };
+
+
+    
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+        {body}
       </div>
     );
   }
