@@ -6,32 +6,36 @@ import Room from './views/Room/Room';
 
 class App extends Component {
   state = {
-    auth : true
+    auth : false,
+    socket: null, 
+    room: null
   };
 
-  teacher(){
-    document.getElementById('userName').value = 'teacher'; 
-    this.setState({auth: true});
+  componentDidMount(){
+    const io = require('socket.io-client');
+    const socket = io('http://localhost:8080/');
+    // Setup Whiteboard
+    this.setState({socket: socket});
+
   }
-  student(){
-    document.getElementById('userName').value = 'student'; 
-    this.setState({auth: true});
+
+  componentDidUpdate(){
+    
+  }
+
+  setRoom(){
+    console.log('room set');
+    const roomNumber = 333;
+    this.setState({room: roomNumber});
   }
 
   render() {
-    let body;
-    if (this.state.auth) {
-      body = <Room />
-    } else {
-      body = <Start teacher={this.teacher.bind(this)} student={this.student.bind(this)}/>
-    };
 
 
-    
     return (
       <div className="App">
-      <input type='hidden' id='userName'/>
-        {body}
+        
+        <Room room='222'/>
       </div>
     );
   }

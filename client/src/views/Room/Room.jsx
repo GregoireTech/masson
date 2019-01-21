@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import './Room.css';
-import {canvas} from '../../assets/JS/canvas';
-import student from '../../assets/JS/student';
-import teacher from '../../assets/JS/teacher';
+import { canvas } from '../../assets/JS/canvas';
+//import studentRTC from '../../assets/JS/student';
+//import teacherRTC from '../../assets/JS/teacher';
 
 import Tools from '../../components/tools/tools';
 import Canvas from '../../components/canvas/canvas';
@@ -14,34 +14,45 @@ class Room extends Component {
         loaded: false,
         width: null,
         height: null,
-        roomName: this.props.user
+        roomName: this.props.room
     }
-
-    componentDidMount(){
+    
+    componentDidMount() {
+        const io = require('socket.io-client');
+        const socket = io('http://localhost:8080/rooms');
+        if (this.state.roomName && socket) socket.emit('join', {room: this.props.room});
+        // Setup width & height of the canvas
         const canvasContainer = document.getElementById('container');
         const canvasHeight = canvasContainer.offsetHeight;
         const canvasWidth = canvasContainer.offsetWidth;
+        if (canvasContainer) {
+            canvas(socket);
+        }
         this.setState({
             width: canvasWidth,
             height: canvasHeight,
             loaded: true
         });
-        
+        // Setup Socket connection
+
+        // Setup web RTC
+        //studentRTC(socket);
+        //teacherRTC(socket);
+
     }
 
-    student(){
-        student();
+    componentDidUpdate() {
+        //if (this.props.roomName) socket.join(this.props.roomName);
     }
-    teacher(){
-        teacher();
-    }
+
+
 
     render() {
         let canvas;
-        if (this.state.loaded){
-            canvas =  <Canvas width={this.state.width} height={this.state.height} />
+        if (this.state.loaded) {
+            canvas = <Canvas width={this.state.width} height={this.state.height} />
         } else {
-            canvas =  null;
+            canvas = null;
         }
         return (
             <div className='globalContainer'>

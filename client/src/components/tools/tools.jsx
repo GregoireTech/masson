@@ -56,7 +56,8 @@ const tools = (props) => {
                 <option value="40">40 Px</option>
                 </select>
             </span>
-            <button type="button" className="btn btn-warning btn-sm" id="web_rtc_button">WebRTC</button>
+            <button type="button" className="btn btn-warning btn-sm" id="send_rtc_button">1. Send Visio</button>
+            <button type="button" className="btn btn-warning btn-sm" id="accept_rtc_button">2. Accept Visio</button>
             
         </div>
     );

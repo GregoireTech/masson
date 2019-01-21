@@ -4,8 +4,8 @@ import './start.css';
 const start = (props) => {
     return(
         <div className='btnContainer'>
-            <button onClick={props.student} id="student">Student</button>
-            <button onClick={props.teacher} id="teacher">Teacher</button>
+            <div className='button' onClick={props.start} >Start</div>
+            
         </div>
     );
 };

@@ -1,10 +1,13 @@
 const iolib = require('socket.io');
-let rooms = require('./data/rooms.json');
+const roomModel = require('./models/Room');
+const Room = roomModel.Room;
+let rooms = {};
 
 // Start the socket server
 function startIO(app) {
     io = iolib(app);
     io.on('connection', onConnection);
+    io.of('/rooms').on('connection', connectToRoom);
     return io;
 };
 
@@ -13,37 +16,52 @@ function startIO(app) {
 function onConnection(socket) {
 
     console.log('user connected');
+    // ROOM FUNCTIONS
 
-    // ON DISCONNECT
-    socket.on('disconnect', function () {
-        console.log('user disconnected');
+    // If the user wants to create a room
+    socket.on('create_room', data => {
+        // if the room does not exist, create it
+        if (rooms.includes(data.roomName)) {
+            const newRoom = new Room();
+            newRoom.addUser(data.password);
+            rooms[data.roomName] = newRoom;
+            socket['room'] = data.roomName;
+        }
+        // if the room exists, inform user
+        else {
+            socket.to(socket.id).emit('already_exists');
+        }
     });
 
 
+}
+////////////////////////////////////////////////
+//           ONCE CONNECTED TO A ROOM         //
+////////////////////////////////////////////////
+function connectToRoom(socket) {
 
-    // THE WEBRTC FUNCTIONALITIES
-    /* ALICE message type */
-    socket.on('ASK_WEB_RTC', function (msg) {
-        console.log('ASK_WEB_RTC: ' + msg);
-        io.emit('ASK_WEB_RTC', msg);
+
+
+
+    console.log('user in rooms');
+    socket.on('join', (room) => {
+        console.log(room, rooms);
+        const newRoom = new Room ('zvdzv');
+        newRoom.addUser();
+        rooms[room.room] = newRoom;
+        console.log(rooms[room.room]);
+        if (rooms[room.room] != undefined) {
+            if (rooms[room.room].usersCounter < 2) {
+                socket.join(room.room);
+                socket['room'] = room.room;
+                console.log(socket['room']);
+            } else {
+                console.log('too many users');
+            }; 
+        } else {
+            console.log('room does not exist');      
+        };
     });
-
-    socket.on('CANDIDATE_WEB_RTC_ALICE', function (msg) {
-        console.log('CANDIDATE_WEB_RTC_ALICE: ' + msg);
-        io.emit('CANDIDATE_WEB_RTC_ALICE', msg);
-    });
-
-    /* BOB message type */
-    socket.on('CANDIDATE_WEB_RTC_BOB', function (msg) {
-        console.log('CANDIDATE_WEB_RTC_BOB: ' + msg);
-        io.emit('CANDIDATE_WEB_RTC_BOB', msg);
-    });
-
-    socket.on('RESPONSE_WEB_RTC', function (msg) {
-        console.log('RESPONSE_WEB_RTC: ' + msg);
-        io.emit('RESPONSE_WEB_RTC', msg);
-    });
-
 
     // THE WHITEBOARD FUNCTIONALITIES
     socket.on('drawing', function (data) {
@@ -53,6 +71,7 @@ function onConnection(socket) {
 
     socket.on('rectangle', function (data) {
         socket.broadcast.emit('rectangle', data);
+        console.log(socket['room']);
         console.log(data);
     });
 
@@ -84,6 +103,11 @@ function onConnection(socket) {
     socket.on('Clearboard', function (data) {
         socket.broadcast.emit('Clearboard', data);
         console.log(data);
+    });
+
+    // ON DISCONNECT
+    socket.on('disconnect', function () {
+        console.log('user disconnected');
     });
 
 };

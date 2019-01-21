@@ -1,9 +1,6 @@
 
-export const canvas  = () => {
+export const canvas  = (socket) => {
 
-  const io = require('socket.io-client');
-
-  var socket = io('http://localhost:3001');
   // This object holds the implementation of each drawing tool.
   var tools = {};
   var textarea;

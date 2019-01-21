@@ -1,18 +1,12 @@
-const teacher = () => {
+const teacher = (socket) => {
+    // SEtup Socket.io
 
-    const io = require('socket.io-client');
-
-    var socket = io('http://localhost:3001');
-    // This object holds the implementation of each drawing tool.
-
-
+    var aliceConn = {};
 
 
     //////////////////////////////////////////////////////////////////////
     //////////////////////        WEBRTC     /////////////////////////////
     //////////////////////////////////////////////////////////////////////
-    var aliceConn = {};
-
     function Event(name) {
         this.name = name;
         this.callbacks = [];
@@ -44,6 +38,8 @@ const teacher = () => {
     var reactor = new Reactor();
     reactor.registerEvent('webRTCDataChannel');
 
+
+
     //////////////////////////////////////////////////////////////////////
     //////////////////////        WEBRTC     /////////////////////////////
     //////////////////////////////////////////////////////////////////////
@@ -66,16 +62,16 @@ const teacher = () => {
             var pcConstraints = {
                 'optional': []
             };
-            // if (window.mozRTCPeerConnection) {
-            //     return new mozRTCPeerConnection(servers, pcConstraints);
-            // } else if (window.webkitRTCPeerConnection) {
-            //     return new webkitRTCPeerConnection(servers, pcConstraints);
-            // } else if (window.msRTCPeerConnection) {
-            //     return new msRTCPeerConnection(servers, pcConstraints);
-            // } else {
-            //     return new RTCPeerConnection(servers, pcConstraints);
-            // }
+            /*        if (window.mozRTCPeerConnection) {
+                        return new mozRTCPeerConnection(servers, pcConstraints);
+                    } else if (window.webkitRTCPeerConnection) {
+                        return new webkitRTCPeerConnection(servers, pcConstraints);
+                    } else if (window.msRTCPeerConnection) {
+                        return new msRTCPeerConnection(servers, pcConstraints);
+                    } else {
+            */
             return new RTCPeerConnection(servers, pcConstraints);
+
         }
 
         /**
@@ -89,12 +85,12 @@ const teacher = () => {
         function gotRemoteStream(evt) {
             console.log('gotRemoteStream');
             console.log(evt.stream);
-            video.srcObject  = evt.stream;
+            video.srcObject = evt.stream;
         };
 
         ////////////////////////////////////////////////////////////
-
-        document.getElementById('web_rtc_button').addEventListener('click',function () {
+        const sendBtn = document.getElementById('send_rtc_button');
+        sendBtn.addEventListener('click', function () {
 
             // AdapterJS.webRTCReady(function(isUsingPlugin) {
             // ask authorization for use video and audio
@@ -102,9 +98,11 @@ const teacher = () => {
                 audio: true,
                 video: true
             }, function (aliceStream) {
+
                 const localVideo = document.getElementById('localVideo');
-					localVideo.srcObject = aliceStream;
+                localVideo.srcObject = aliceStream;
                 aliceConn = getBrowserRTCConnectionObj();
+                console.log(aliceConn);
 
                 reactor.dispatchEvent('webRTCDataChannel', 'param1');
 
@@ -184,92 +182,93 @@ const teacher = () => {
         socket.on('RESPONSE_WEB_RTC', function (bobDesc) {
             var bobDesc = bobDesc;
             aliceConn.setRemoteDescription(new RTCSessionDescription(bobDesc));
+
         });
 
     })();
 
-}
+
+
+    //////////////////////////////////////////////////////////////////////
+    /////////////////        WEBRTC  DATA    /////////////////////////////
+    //////////////////////////////////////////////////////////////////////
+    /*
+    (function () {
+        'use strict';
+        var sendChannel = null;
+        var fileInput = document.querySelector('input#fileInput');
+
+        $('form').on('change', '#fileInput', function () {
+
+
+            var file = this.files[0];
+            var chunkSize = 16384;
+            var maxNumberOfChunk = Math.ceil(file.size / chunkSize);
+            var currentNumberOfChunk = 0;
+
+            var message = {
+                type: 'file_info',
+                number: ++currentNumberOfChunk,
+                numberMax: maxNumberOfChunk,
+                fileName: file.name
+            }
+            sendChannel.send(JSON.stringify(message));
+
+            var sliceFile = function (offset) {
+                var reader = new window.FileReader();
+
+                var slice = file.slice(offset, offset + chunkSize);
+                reader.readAsArrayBuffer(slice);
+
+                reader.onload = function (event) {
+                    sendChannel.send(event.target.result);
+                    if (maxNumberOfChunk > ++currentNumberOfChunk) {
+                        console.log('Chunk number : ', currentNumberOfChunk);
+                        sliceFile(offset + chunkSize);
+                    }
+                };
+            };
+            sliceFile(0);
+
+        });
+
+        reactor.addEventListener('webRTCDataChannel', function () {
+            console.log('webRTCDataChannel');
+
+            ////////////////////////////////////////////////////////////
+
+            function onSendChannelStateChange() {
+                var readyState = sendChannel.readyState;
+                console.log('Send channel state is: ' + readyState);
+                if (readyState === 'open') {
+                    enableToSendData();
+                }
+            }
+
+            function enableToSendData() {
+                console.log('enableToSendData');
+                $('form').append('<input type="file" id="fileInput" />');
+            }
+
+            ////////////////////////////////////////////////////////////
+
+            var dataChannelOptions = {
+                ordered: false, // do not guarantee order
+                maxPacketLifeTime: 3000, // in milliseconds
+            };
+
+
+            sendChannel = aliceConn.createDataChannel('sendDataChannel', dataChannelOptions);
+            sendChannel.binaryType = 'arraybuffer';
+
+            sendChannel.onopen = onSendChannelStateChange;
+            sendChannel.onclose = onSendChannelStateChange;
+
+        });
+
+    })();
+
+    */
+};
 
 export default teacher;
-
-
-//////////////////////////////////////////////////////////////////////
-/////////////////        WEBRTC  DATA    /////////////////////////////
-//////////////////////////////////////////////////////////////////////
-/*
-(function () {
-    'use strict';
-    var sendChannel = null;
-    var fileInput = document.querySelector('input#fileInput');
-
-    $('form').on('change', '#fileInput', function () {
-
-
-        var file = this.files[0];
-        var chunkSize = 16384;
-        var maxNumberOfChunk = Math.ceil(file.size / chunkSize);
-        var currentNumberOfChunk = 0;
-
-        var message = {
-            type: 'file_info',
-            number: ++currentNumberOfChunk,
-            numberMax: maxNumberOfChunk,
-            fileName: file.name
-        }
-        sendChannel.send(JSON.stringify(message));
-
-        var sliceFile = function (offset) {
-            var reader = new window.FileReader();
-
-            var slice = file.slice(offset, offset + chunkSize);
-            reader.readAsArrayBuffer(slice);
-
-            reader.onload = function (event) {
-                sendChannel.send(event.target.result);
-                if (maxNumberOfChunk > ++currentNumberOfChunk) {
-                    console.log('Chunk number : ', currentNumberOfChunk);
-                    sliceFile(offset + chunkSize);
-                }
-            };
-        };
-        sliceFile(0);
-
-    });
-
-    reactor.addEventListener('webRTCDataChannel', function () {
-        console.log('webRTCDataChannel');
-
-        ////////////////////////////////////////////////////////////
-
-        function onSendChannelStateChange() {
-            var readyState = sendChannel.readyState;
-            console.log('Send channel state is: ' + readyState);
-            if (readyState === 'open') {
-                enableToSendData();
-            }
-        }
-
-        function enableToSendData() {
-            console.log('enableToSendData');
-            $('form').append('<input type="file" id="fileInput" />');
-        }
-
-        ////////////////////////////////////////////////////////////
-
-        var dataChannelOptions = {
-            ordered: false, // do not guarantee order
-            maxPacketLifeTime: 3000, // in milliseconds
-        };
-
-
-        sendChannel = aliceConn.createDataChannel('sendDataChannel', dataChannelOptions);
-        sendChannel.binaryType = 'arraybuffer';
-
-        sendChannel.onopen = onSendChannelStateChange;
-        sendChannel.onclose = onSendChannelStateChange;
-
-    });
-
-})();
-
-*/
