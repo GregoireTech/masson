@@ -1,6 +1,8 @@
 
 export const canvas  = (socket) => {
 
+
+  console.log('canvas started');
   // This object holds the implementation of each drawing tool.
   var tools = {};
   var textarea;
@@ -92,8 +94,8 @@ export const canvas  = (socket) => {
         }
 
         function pic_tool_click(pick) {
-          if (tools[pick.value]) {
-            tool = new tools[pick.value]();
+          if (tools[pick.alt]) {
+            tool = new tools[pick.alt]();
           }
         }
 
@@ -132,16 +134,16 @@ export const canvas  = (socket) => {
           var gridWidth, gridColor;
 
 
-          if (gridSize == "normal") {
+          if (gridSize === "normal") {
             gridWidth = 25;
             gridColor = "#e7e8e8";
-          } else if (gridSize == "medium") {
+          } else if (gridSize === "medium") {
             gridWidth = 45;
             gridColor = "#e7e8e8";
-          } else if (gridSize == "large") {
+          } else if (gridSize === "large") {
             gridWidth = 65;
             gridColor = "#e7e8e8";
-          } else if (gridSize == "nogrid") {
+          } else if (gridSize === "nogrid") {
             gridWidth = 25;
             gridColor = "#fff"; //no grid
           }
@@ -203,14 +205,14 @@ export const canvas  = (socket) => {
       function ev_canvas(ev) {
         //console.log(ev)
         var CanvPos = canvas.getBoundingClientRect(); //Global Fix cursor position bug
-        if (ev.clientX || ev.clientX == 0) { // Firefox
+        if (ev.clientX || ev.clientX === 0) { // Firefox
           //ev._x = ev.clientX;
           ev._x = ev.clientX - CanvPos.left;
           // ev._x = ev.layerX;
           //ev._y = ev.clientY;
           ev._y = ev.clientY - CanvPos.top;
           //ev._y = ev.layerY;
-        } else if (ev.offsetX || ev.offsetX == 0) { // Opera
+        } else if (ev.offsetX || ev.offsetX === 0) { // Opera
           //ev._x = ev.offsetX;
           //ev._y = ev.offsetY;
         }
@@ -495,58 +497,7 @@ export const canvas  = (socket) => {
 
       };
 
-      //The Circle tool
-
-      //Old Circle Function 
-      // function old_drawCircle(x1, y1, x2, y2, color, linewidth, emit) {
-
-      //   context.clearRect(0, 0, canvas.width, canvas.height);
-
-      //   var radiusX = (x2 - x1) * 0.5,
-      //     radiusY = (y2 - y1) * 0.5,
-      //     centerX = x1 + radiusX,
-      //     centerY = y1 + radiusY,
-      //     step = 0.01,
-      //     a = step,
-      //     pi2 = Math.PI * 2 - step;
-
-      //   context.beginPath();
-      //   context.moveTo(centerX + radiusX * Math.cos(0),
-      //     centerY + radiusY * Math.sin(0));
-
-      //   for (; a < pi2; a += step) {
-      //     context.lineTo(centerX + radiusX * Math.cos(a),
-      //       centerY + radiusY * Math.sin(a));
-      //   }
-
-      //   context.closePath();
-      //   if (color)
-      //     context.strokeStyle = "#" + color;
-      //   else
-      //     context.strokeStyle = "#" + colorPicked;
-      //   if (linewidth)
-      //     context.lineWidth = linewidth;
-      //   else
-      //     context.lineWidth = lineWidthPicked;
-      //   context.stroke();
-
-
-      //   if (!emit) {
-      //     return;
-      //   }
-      //   var w = canvaso.width;
-      //   var h = canvaso.height;
-
-      //   socket.emit('circledraw', {
-      //     x1: x1 / w,
-      //     y1: y1 / h,
-      //     x2: x2 / w,
-      //     y2: y2 / h,
-      //     color: colorPicked,
-      //     lineThickness: lineWidthPicked
-      //   });
-
-      // }
+      
 
       //New Circle Function
       function drawCircle(x1, y1, x2, y2, color, linewidth, emit) {
@@ -964,6 +915,13 @@ export const canvas  = (socket) => {
         contexto.clearRect(0, 0, canvaso.width, canvaso.height);
         clearAll_update(true)
       });
+
+
+      socket.on('getRoomLines', lines => {
+        console.log(lines);
+    });
+
+
 
 
       init();

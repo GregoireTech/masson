@@ -2,15 +2,57 @@ import React from 'react';
 import './tools.css';
 
 const tools = (props) => {
+
+
+    const toolList = [
+        {
+        id: 'pencil-button',
+        name:'pencil'
+    },
+        {
+        id: 'rect-button',
+        name:'rect'
+    },
+        {
+        id: 'circle-button',
+        name:'circle'
+    },
+        {
+        id: 'ellipse-button',
+        name:'ellipse'
+    },
+        {
+        id: 'line-button',
+        name:'line'
+    },
+        {
+        id: 'text-button',
+        name:'text'
+    },
+        {
+        id: 'clear-all',
+        name:'clear-all'
+    }
+    
+]
+
+    let tools = toolList.map(tool => {
+        let toolUrl = require(`../../assets/icons/tools/${tool.name}.svg`); 
+        return (
+            <img key={tool.name} src={toolUrl} alt={tool.name} id={tool.id}/>
+        );
+    });
+
     return(
         <div className="toolsContainer">
-            <button type="button" className="btn btn-warning btn-sm" value="pencil" id="pencil-button">Pencil</button>
+            {tools}
+            {/* <button type="button" className="btn btn-warning btn-sm" value="pencil" id="pencil-button">Pencil</button>
             <button type="button" className="btn btn-warning btn-sm" value="rect" id="rect-button">Rectangle</button>
             <button type="button" className="btn btn-warning btn-sm" value="circle" id="circle-button">Circle</button>
             <button type="button" className="btn btn-warning btn-sm" value="ellipse" id="ellipse-button">Ellipse</button>
             <button type="button" className="btn btn-warning btn-sm" value="line" id="line-button">Line</button>
             <button type="button" className="btn btn-warning btn-sm" value="text" id="text-button">Text</button>
-            <button type="button" className="btn btn-warning btn-sm" id="clear-all">Clear All</button>
+            <button type="button" className="btn btn-warning btn-sm" id="clear-all">Clear All</button> */}
             <label htmlFor="colour">Colour : </label>
             {/* defaultValue was value before in color picker */}
             <input id="colour-picker" defaultValue="#000000" className="jscolor {width:243, height:150, position:'right',
@@ -56,9 +98,6 @@ const tools = (props) => {
                 <option value="40">40 Px</option>
                 </select>
             </span>
-            <button type="button" className="btn btn-warning btn-sm" id="send_rtc_button">1. Send Visio</button>
-            <button type="button" className="btn btn-warning btn-sm" id="accept_rtc_button">2. Accept Visio</button>
-            
         </div>
     );
 };

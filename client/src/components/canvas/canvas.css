@@ -10,6 +10,7 @@
 }
 
 canvas {
-    border-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
     cursor: url(../../assets/img/pen.png), crosshair;
 }

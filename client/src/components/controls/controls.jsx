@@ -32,7 +32,7 @@ const controls = (props) => {
     ];
 
     let controlItems = controlsList.map((control) => {
-        let imgUrl=require(`../../assets/icons/${control.link}.svg`);
+        let imgUrl=require(`../../assets/icons/controls/${control.link}.svg`);
         if (control.link === 'camera' ) {
             return(
                 <li onClick={props.teacher} key={control.link} className='control' id={control.link} >

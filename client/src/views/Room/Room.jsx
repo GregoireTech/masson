@@ -18,6 +18,7 @@ class Room extends Component {
     }
     
     componentDidMount() {
+        //Connect to room
         const io = require('socket.io-client');
         const socket = io('http://localhost:8080/rooms');
         if (this.state.roomName && socket) socket.emit('join', {room: this.props.room});
@@ -33,11 +34,6 @@ class Room extends Component {
             height: canvasHeight,
             loaded: true
         });
-        // Setup Socket connection
-
-        // Setup web RTC
-        //studentRTC(socket);
-        //teacherRTC(socket);
 
     }
 
@@ -60,7 +56,6 @@ class Room extends Component {
                 <div id="container">
                     {canvas}
                 </div>
-                }
                 <Controls teacher={this.teacher} student={this.student} />
             </div>
         );

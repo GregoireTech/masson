@@ -1,41 +1,33 @@
 import React, { Component } from 'react';
 import './App.css';
 
-import Start from './views/start/start';
+import Start from './views/Start/Start';
 import Room from './views/Room/Room';
 
 class App extends Component {
   state = {
     auth : false,
-    socket: null, 
-    room: null
+    room: false
   };
 
-  componentDidMount(){
-    const io = require('socket.io-client');
-    const socket = io('http://localhost:8080/');
-    // Setup Whiteboard
-    this.setState({socket: socket});
 
-  }
-
-  componentDidUpdate(){
-    
-  }
-
-  setRoom(){
+  join(room){
     console.log('room set');
-    const roomNumber = 333;
-    this.setState({room: roomNumber});
+    const roomNumber = room;
+    this.setState({room: roomNumber, auth : true});
   }
 
   render() {
-
+    let body;
+    if (this.state.auth && this.state.room) {
+      body = (<Room room={this.state.room} />);
+    } else {
+      body = (<Start join={this.join.bind(this)}/> );
+    }
 
     return (
       <div className="App">
-        
-        <Room room='222'/>
+      {body}
       </div>
     );
   }

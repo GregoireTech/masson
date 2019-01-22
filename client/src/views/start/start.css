@@ -1,20 +1,17 @@
-.btnContainer {
-    width: 10rem;
-    height: 5rem;
+.startContainer {
+    width: 80%;
+    padding: 3rem 2rem;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    text-align: center;
-};
-
-.btnContainer div{
+    text-align: left;
     background: white;
-    height: 3rem;
-    width: 5rem;
-    font-weight: bold;
-    font-size: 1.5rem;
-    cursor: pointer;
 }
 
+;
 
+.startContainer li {
+    list-style: none;
+    text-decoration: none;
+}
