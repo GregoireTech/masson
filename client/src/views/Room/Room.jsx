@@ -14,7 +14,8 @@ class Room extends Component {
         loaded: false,
         width: null,
         height: null,
-        roomName: this.props.room
+        roomName: this.props.room,
+        socket: null
     }
     
     componentDidMount() {
@@ -26,18 +27,22 @@ class Room extends Component {
         const canvasContainer = document.getElementById('container');
         const canvasHeight = canvasContainer.offsetHeight;
         const canvasWidth = canvasContainer.offsetWidth;
-        if (canvasContainer) {
-            canvas(socket);
-        }
+
         this.setState({
             width: canvasWidth,
             height: canvasHeight,
-            loaded: true
+            loaded: true,
+            socket: socket
         });
+
 
     }
 
     componentDidUpdate() {
+        if (this.state.loaded && this.state.socket) {
+            const socket = this.state.socket;
+            canvas(socket);
+        }
         //if (this.props.roomName) socket.join(this.props.roomName);
     }
 
