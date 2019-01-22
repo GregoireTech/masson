@@ -2,7 +2,7 @@
 
 class Room {
     constructor(password){
-        this.password;
+        this.password = password;
         this.usersCounter = 0;
         this.lines = [];
     }
@@ -16,6 +16,9 @@ class Room {
             path: path
         }
         this.lines.push(newLine);
+    }
+    clearAll(){
+        this.lines = [];
     }
 };
 
