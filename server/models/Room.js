@@ -1,8 +1,10 @@
 
 
 class Room {
-    constructor(password){
+    constructor(name, password){
+        this.name = name;
         this.password = password;
+        this.string = `id=${name}&&pass=${password}`
         this.usersCounter = 0;
         this.lines = [];
     }

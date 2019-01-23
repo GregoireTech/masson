@@ -14,15 +14,17 @@ class Room extends Component {
         loaded: false,
         width: null,
         height: null,
-        roomName: this.props.room,
+        roomName: 'greg',
         socket: null
     }
     
     componentDidMount() {
         //Connect to room
+        const roomName = '';
+        const pass = '';
         const io = require('socket.io-client');
         const socket = io('http://localhost:8080/rooms');
-        if (this.state.roomName && socket) socket.emit('join', {room: this.props.room});
+        if (this.state.roomName && socket) socket.emit('join', {room: roomName});
         // Setup width & height of the canvas
         const canvasContainer = document.getElementById('container');
         const canvasHeight = canvasContainer.offsetHeight;

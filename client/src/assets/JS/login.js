@@ -12,7 +12,7 @@ const login = (props) => {
         //this.props.join(room.name);
     });
     socket.on('setRoomList', data => {
-        const newList = data.roomList;
+        const newList = data.myRooms;
         console.log(newList);
         props.addRoom(newList);
         //this.setState({roomList: newList});
