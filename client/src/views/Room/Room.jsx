@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './Room.css';
 import { canvas } from '../../assets/JS/canvas';
+import queryString from 'query-string';
 //import studentRTC from '../../assets/JS/student';
 //import teacherRTC from '../../assets/JS/teacher';
 
@@ -19,20 +20,21 @@ class Room extends Component {
     }
     
     componentDidMount() {
+        // get URL Params
+        const params = queryString.parse(window.location.search);
+        console.log(params.id, params.pass);
+
         //Connect to room
-        const roomName = '';
-        const pass = '';
+        const roomName = params.id;
+        const pass = params.pass;
         const io = require('socket.io-client');
         const socket = io('http://localhost:8080/rooms');
         if (this.state.roomName && socket) socket.emit('join', {room: roomName});
         // Setup width & height of the canvas
-        const canvasContainer = document.getElementById('container');
-        const canvasHeight = canvasContainer.offsetHeight;
-        const canvasWidth = canvasContainer.offsetWidth;
+        this.setCanvaSize();
+        window.addEventListener('resize', this.setCanvaSize.bind(this));
 
         this.setState({
-            width: canvasWidth,
-            height: canvasHeight,
             loaded: true,
             socket: socket
         });
@@ -46,6 +48,16 @@ class Room extends Component {
             canvas(socket);
         }
         //if (this.props.roomName) socket.join(this.props.roomName);
+    }
+
+    setCanvaSize(){
+        const canvasContainer = document.getElementById('container');
+        const canvasHeight = canvasContainer.offsetHeight;
+        const canvasWidth = canvasContainer.offsetWidth;
+        this.setState({
+            width: canvasWidth,
+            height: canvasHeight
+        });
     }
 
 

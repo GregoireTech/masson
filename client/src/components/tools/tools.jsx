@@ -55,8 +55,10 @@ const tools = (props) => {
             <button type="button" className="btn btn-warning btn-sm" id="clear-all">Clear All</button> */}
             <label htmlFor="colour">Colour : </label>
             {/* defaultValue was value before in color picker */}
-            <input id="colour-picker" defaultValue="#000000" className="jscolor {width:243, height:150, position:'right',
-            borderColor:'#FFF', insetColor:'#FFF', backgroundColor:'#666'}"/>
+            <input id="colour-picker" value="#000000" className="jscolor {width:243, height:150, position:'right',
+            borderColor:'#FFF', insetColor:'#FFF', backgroundColor:'#666'}"></input>
+            {/* <input id="colour-picker" defaultValue="#000000" className="jscolor {width:243, height:150, position:'right',
+            borderColor:'#FFF', insetColor:'#FFF', backgroundColor:'#666'}"/> */}
             <span className="form-group" >
                 <label htmlFor="line-Width">Thickness: </label>
                 <select className="form-control" id="line-Width">

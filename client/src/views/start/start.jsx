@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import queryString from 'query-string';
 import './Start.css';
 import login from '../../assets/JS/login';
 import {Link} from 'react-router-dom';
@@ -16,6 +17,8 @@ class Start extends Component {
     }
 
     componentDidMount(){
+        const params = queryString.parse(window.location.search);
+        console.log(params.id, params.pass);
         const io = require('socket.io-client');
         const socket = io('http://localhost:8080/');
         login(
