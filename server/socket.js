@@ -43,7 +43,7 @@ const checkIfRoom = (socket, callback) => {
 
 const generateId = () => {
     const date = JSON.stringify(new Date());
-    const random = JSON.stringify(Math.floor(Math.random() * Math.floor(100)));
+    const random = JSON.stringify(Math.floor(Math.random() * Math.floor(1000)));
     const id = date + random;
     return id;
 }
@@ -95,19 +95,23 @@ function onConnection(socket) {
 function connectToRoom(socket) {
 
     console.log('user in rooms');
-    socket.on('join', (room) => {
-        console.log(room, rooms);
-        if (rooms[room.room] != undefined) {
-            if (rooms[room.room].usersCounter < 2) {
-                socket.join(room.room);
-                socket['room'] = room.room;
-                console.log(socket['room'], 'connected');
-                socket.emit('getRoomLines', {
-                    lines: rooms[room.room].lines
-                });
+    socket.on('join', (data) => {
+        console.log(data);
+        if (rooms[data.room] != undefined) {
+            if (rooms[data.room].pin === data.pin) {
+                if (rooms[data.room].usersCounter < 2) {
+                    socket.join(data.room);
+                    socket['room'] = data.room;
+                    console.log(socket['room'], 'connected');
+                    socket.emit('getRoomLines', {
+                        lines: rooms[data.room].lines
+                    });
+                } else {
+                    console.log('too many users');
+                };
             } else {
-                console.log('too many users');
-            };
+                console.log('wrong pin');
+            }
         } else {
             console.log('room does not exist');
         };
@@ -115,70 +119,61 @@ function connectToRoom(socket) {
 
     // THE WHITEBOARD FUNCTIONALITIES
     socket.on('drawing', function (data) {
-        checkIfRoom(socket, function (socket, data) {
-            socket.to(socket['room']).emit('drawing', data);
-            rooms[socket['room']].addLine('drawing', data);
-        });
+        socket.to(socket['room']).emit('drawing', data);
+        rooms[socket['room']].addLine('drawing', data);
         console.log(data);
     });
 
     socket.on('rectangle', function (data) {
-        checkIfRoom(socket, function (socket, data) {
-            socket.to(socket['room']).emit('rectangle', data);
-            console.log(socket['room']);
-            rooms[socket['room']].addLine('rectangle', data);
-            console.log(data);
-        });
+        socket.to(socket['room']).emit('rectangle', data);
+        console.log(socket['room']);
+        rooms[socket['room']].addLine('rectangle', data);
+        console.log(data);
     });
+
 
     socket.on('linedraw', function (data) {
-        checkIfRoom(socket, function (socket, data) {
-            socket.to(socket['room']).emit('linedraw', data);
-            rooms[socket['room']].addLine('linedraw', data);
-            console.log(data);
-        });
+        socket.to(socket['room']).emit('linedraw', data);
+        rooms[socket['room']].addLine('linedraw', data);
+        console.log(data);
     });
+
 
     socket.on('circledraw', function (data) {
-        checkIfRoom(socket, function (socket, data) {
-            socket.to(socket['room']).emit('circledraw', data);
-            rooms[socket['room']].addLine('circledraw', data);
-            console.log(data);
-        });
+        socket.to(socket['room']).emit('circledraw', data);
+        rooms[socket['room']].addLine('circledraw', data);
+        console.log(data);
     });
+
 
     socket.on('ellipsedraw', function (data) {
-        checkIfRoom(socket, function (socket, data) {
-            socket.to(socket['room']).emit('ellipsedraw', data);
-            rooms[socket['room']].addLine('ellipsedraw', data);
-            console.log(data);
-            console.log(rooms[socket['room']]);
-        });
+        socket.to(socket['room']).emit('ellipsedraw', data);
+        rooms[socket['room']].addLine('ellipsedraw', data);
+        console.log(data);
+        console.log(rooms[socket['room']]);
     });
+
 
     socket.on('textdraw', function (data) {
-        checkIfRoom(socket, function (socket, data) {
-            socket.to(socket['room']).emit('textdraw', data);
-            rooms[socket['room']].addLine('textdraw', data);
-            console.log(data);
-        });
+        socket.to(socket['room']).emit('textdraw', data);
+        rooms[socket['room']].addLine('textdraw', data);
+        console.log(data);
     });
+
 
     socket.on('copyCanvas', function (data) {
-        checkIfRoom(socket, function (socket, data) {
-            socket.to(socket['room']).emit('copyCanvas', data);
-            rooms[socket['room']].addLine('copyCanvas', data);
-            console.log(data);
-        });
+        socket.to(socket['room']).emit('copyCanvas', data);
+        rooms[socket['room']].addLine('copyCanvas', data);
+        console.log(data);
     });
 
+
     socket.on('Clearboard', function (data) {
-        checkIfRoom(socket, function (socket, data) {
-            socket.to(socket['room']).emit('Clearboard', data);
-            rooms[socket['room']].clearAll();
-            console.log(data);
-        });
+        socket.to(socket['room']).emit('Clearboard', data);
+        rooms[socket['room']].clearAll();
+        console.log(data);
     });
+
 
     // ON DISCONNECT
     socket.on('disconnect', function () {

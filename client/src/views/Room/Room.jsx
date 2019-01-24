@@ -22,14 +22,13 @@ class Room extends Component {
     componentDidMount() {
         // get URL Params
         const params = queryString.parse(window.location.search);
-        console.log(params.id, params.pass);
-
+        console.log(params);
         //Connect to room
         const roomName = params.id;
-        const pass = params.pass;
+        const pin = params.pin;
         const io = require('socket.io-client');
         const socket = io('http://localhost:8080/rooms');
-        if (this.state.roomName && socket) socket.emit('join', {room: roomName});
+        if (this.state.roomName && socket) socket.emit('join', {room: roomName, pin: pin});
         // Setup width & height of the canvas
         this.setCanvaSize();
         window.addEventListener('resize', this.setCanvaSize.bind(this));
@@ -38,9 +37,8 @@ class Room extends Component {
             loaded: true,
             socket: socket
         });
-
-
     }
+    
 
     componentDidUpdate() {
         if (this.state.loaded && this.state.socket) {

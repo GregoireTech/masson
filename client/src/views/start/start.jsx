@@ -18,7 +18,7 @@ class Start extends Component {
 
     componentDidMount(){
         const params = queryString.parse(window.location.search);
-        console.log(params.id, params.pass);
+        console.log(params);
         const io = require('socket.io-client');
         const socket = io('http://localhost:8080/');
         login(
@@ -51,7 +51,7 @@ class Start extends Component {
                 return (
                     <div className="room" key={index} >
                         <p className='roomName'>{room.name}
-                            <Link to={`/rooms/${room.string}`} >
+                            <Link to={`/rooms/?${room.string}`} >
                                 <button className='btn joinBtn'>Rejoindre</button>
                             </Link>
                         </p>
