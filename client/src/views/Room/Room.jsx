@@ -1,13 +1,17 @@
+// External modules
 import React, { Component } from 'react';
-import './Room.css';
-import { canvas } from '../../assets/JS/canvas';
 import queryString from 'query-string';
-//import studentRTC from '../../assets/JS/student';
-//import teacherRTC from '../../assets/JS/teacher';
 
+// Scripts
+//import { canvas } from '../../assets/JS/canvas';
+import webRTC from '../../assets/JS/webRTC';
+
+// React components
 import Tools from '../../components/tools/tools';
 import Canvas from '../../components/canvas/canvas';
 import Controls from '../../components/controls/controls';
+// Stylesheet
+import './Room.css';
 
 class Room extends Component {
 
@@ -28,10 +32,11 @@ class Room extends Component {
         const pin = params.pin;
         const io = require('socket.io-client');
         const socket = io('http://localhost:8080/rooms');
-        if (this.state.roomName && socket) socket.emit('join', {room: roomName, pin: pin});
+        if (this.state.roomName && socket) {
+            socket.emit('join', {room: roomName, pin: pin}, (res) => {});
+        }
         // Setup width & height of the canvas
-        this.setCanvaSize();
-        window.addEventListener('resize', this.setCanvaSize.bind(this));
+        //window.addEventListener('resize', this.setCanvaSize.bind(this));
 
         this.setState({
             loaded: true,
@@ -43,7 +48,9 @@ class Room extends Component {
     componentDidUpdate() {
         if (this.state.loaded && this.state.socket) {
             const socket = this.state.socket;
-            canvas(socket);
+            //canvas(socket);
+            webRTC(socket);
+
         }
         //if (this.props.roomName) socket.join(this.props.roomName);
     }
