@@ -1,11 +1,9 @@
 // External modules
 import React, { Component } from 'react';
 import queryString from 'query-string';
-
 // Scripts
-//import { canvas } from '../../assets/JS/canvas';
+import { canvas } from '../../assets/JS/canvas';
 import webRTC from '../../assets/JS/webRTC';
-
 // React components
 import Tools from '../../components/tools/tools';
 import Canvas from '../../components/canvas/canvas';
@@ -20,23 +18,24 @@ class Room extends Component {
         width: null,
         height: null,
         roomName: 'greg',
-        socket: null
+        socket: null,
+        pickedColor: '#345678'
     }
     
     componentDidMount() {
         // get URL Params
         const params = queryString.parse(window.location.search);
-        console.log(params);
-        //Connect to room
         const roomName = params.id;
         const pin = params.pin;
+        //Connect to room
         const io = require('socket.io-client');
         const socket = io('http://localhost:8080/rooms');
         if (this.state.roomName && socket) {
             socket.emit('join', {room: roomName, pin: pin}, (res) => {});
         }
         // Setup width & height of the canvas
-        //window.addEventListener('resize', this.setCanvaSize.bind(this));
+        this.setCanvaSize();
+        window.addEventListener('resize', this.setCanvaSize.bind(this));
 
         this.setState({
             loaded: true,
@@ -44,15 +43,12 @@ class Room extends Component {
         });
     }
     
-
     componentDidUpdate() {
         if (this.state.loaded && this.state.socket) {
             const socket = this.state.socket;
-            //canvas(socket);
+            canvas(socket, this.state.pickedColor);
             webRTC(socket);
-
         }
-        //if (this.props.roomName) socket.join(this.props.roomName);
     }
 
     setCanvaSize(){
@@ -65,7 +61,10 @@ class Room extends Component {
         });
     }
 
-
+    changeColor(e){
+        console.log('change color to: ', e.target.value);
+        this.setState({pickedColor: e.target.value});
+    }
 
     render() {
         let canvas;
@@ -76,11 +75,17 @@ class Room extends Component {
         }
         return (
             <div className='globalContainer'>
-                <Tools />
+                <Tools 
+                    color={this.state.pickedColor} 
+                    colorChanged={this.changeColor.bind(this)} 
+                />
                 <div id="container">
                     {canvas}
                 </div>
-                <Controls teacher={this.teacher} student={this.student} />
+                <Controls 
+                    teacher={this.teacher} 
+                    student={this.student} 
+                />
             </div>
         );
     };

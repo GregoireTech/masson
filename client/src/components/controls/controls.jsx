@@ -63,7 +63,7 @@ const controls = (props) => {
                 {controlItems}
             </ul>
             <video autoPlay id="remoteVideo"></video>
-            <video autoPlay id="localVideo"></video>
+            <video autoPlay muted id="localVideo"></video>
         </div>
     );
 };

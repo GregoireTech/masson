@@ -18,10 +18,10 @@ class Room {
         return pin;
     }
 
-    addLine(type, path){
+    addLine(type, data){
         const newLine = {
             type: type,
-            path: path
+            data: data
         }
         this.lines.push(newLine);
     }

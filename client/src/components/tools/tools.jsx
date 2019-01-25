@@ -1,4 +1,5 @@
 import React from 'react';
+//import ColorPicker from 'react-input-color';
 import './tools.css';
 
 const tools = (props) => {
@@ -46,19 +47,19 @@ const tools = (props) => {
     return(
         <div className="toolsContainer">
             {tools}
-            {/* <button type="button" className="btn btn-warning btn-sm" value="pencil" id="pencil-button">Pencil</button>
-            <button type="button" className="btn btn-warning btn-sm" value="rect" id="rect-button">Rectangle</button>
-            <button type="button" className="btn btn-warning btn-sm" value="circle" id="circle-button">Circle</button>
-            <button type="button" className="btn btn-warning btn-sm" value="ellipse" id="ellipse-button">Ellipse</button>
-            <button type="button" className="btn btn-warning btn-sm" value="line" id="line-button">Line</button>
-            <button type="button" className="btn btn-warning btn-sm" value="text" id="text-button">Text</button>
-            <button type="button" className="btn btn-warning btn-sm" id="clear-all">Clear All</button> */}
+            
             <label htmlFor="colour">Colour : </label>
-            {/* defaultValue was value before in color picker */}
-            <input id="colour-picker" defaultValue="#000000" className="jscolor {width:243, height:150, position:'right',
-            borderColor:'#FFF', insetColor:'#FFF', backgroundColor:'#666'}"></input>
-            {/* <input id="colour-picker" defaultValue="#000000" className="jscolor {width:243, height:150, position:'right',
-            borderColor:'#FFF', insetColor:'#FFF', backgroundColor:'#666'}"/> */}
+            <input 
+                id='colour-picker'
+                type='color' 
+                value={props.color}
+                onChange={props.colorChanged}
+            />
+                {/* <ColorPicker 
+            value={props.color}
+            defaultValue="#345678"
+            onChange={props.colorChange}
+            /> */}
             <span className="form-group" >
                 <label htmlFor="line-Width">Thickness: </label>
                 <select className="form-control" id="line-Width">

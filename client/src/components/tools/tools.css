@@ -14,6 +14,7 @@
     display: block;
     margin: 1.2rem auto;
     cursor: pointer;
+    text-align: center;
 }
 
 
@@ -32,6 +33,7 @@
 
 label {
     color: rgb(55,55,55);
+    margin: 0 auto;
 
 }
 

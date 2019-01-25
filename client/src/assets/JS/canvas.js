@@ -1,12 +1,14 @@
 
-export const canvas  = (socket) => {
+export const canvas  = (socket, colorPicked) => {
 
 
- 
+  socket.on('lineTest', (data) =>  {
+    console.log('lineTest', data)
+  });
+
   // This object holds the implementation of each drawing tool.
   var tools = {};
   var textarea;
-  var colorPicked;
   var lineWidthPicked;
   var SelectedFontFamily;
   var SelectedFontSize;
@@ -30,7 +32,6 @@ export const canvas  = (socket) => {
       var tool_default = 'pencil';
 
       function init() {
-        console.log('canvas started');
         // Find the canvas element.
         canvaso = document.getElementById('imageView');
         if (!canvaso) {
@@ -72,8 +73,8 @@ export const canvas  = (socket) => {
         //tool_select.addEventListener('change', ev_tool_change, false);
 
         //Choose colour picker
-        colorPicked = getValue('colour-picker');
-        valueChangeListen('colour-picker', function(){ colorPicked = getValue('colour-picker')});
+        //colorPicked = colorProp;
+        //valueChangeListen('colour-picker', function(){ colorPicked = getValue('colour-picker')});
 
         //Choose line Width
         lineWidthPicked = getValue('line-Width');
@@ -126,7 +127,7 @@ export const canvas  = (socket) => {
 
 
         //Draw Grids
-        function SketchGrid(gridSize) {
+       /* function SketchGrid(gridSize) {
           context.clearRect(0, 0, canvas.width, canvas.height);
 
           var w = canvas.width;
@@ -152,7 +153,7 @@ export const canvas  = (socket) => {
            * i is used for both x and y to draw
            * a line every 5 pixels starting at
            * .5 to offset the canvas edges
-           */
+          
 
           context.beginPath(); //important draw new everytime
 
@@ -168,7 +169,7 @@ export const canvas  = (socket) => {
           //contexto.strokeStyle = 'hsla(0, 0%, 40%, .5)';
           context.stroke();
 
-        }
+        }*/
 
         /*var SelectedGrid = $("#draw-grid").val();
     
@@ -228,11 +229,11 @@ export const canvas  = (socket) => {
       }
 
       // The event handler for any changes made to the tool selector.
-      function ev_tool_change(ev) {
+      /*function ev_tool_change(ev) {
         if (tools[this.value]) {
           tool = new tools[this.value]();
         }
-      }
+      }*/
 
 
       // This function draws the #imageTemp canvas on top of #imageView, after which 
@@ -423,6 +424,7 @@ export const canvas  = (socket) => {
       };
       //Lines
       function drawLines(x0, y0, x1, y1, color, linewidth, emit) {
+        console.log('line:', color)
         context.clearRect(0, 0, canvas.width, canvas.height);
         context.beginPath();
         context.moveTo(x0, y0);
@@ -601,7 +603,7 @@ export const canvas  = (socket) => {
 
 
       function drawEllipse(x, y, w, h, color, linewidth, emit) {
-
+        console.log(color);
         context.clearRect(0, 0, canvas.width, canvas.height);
         var kappa = .5522848;
         var ox = (w / 2) * kappa; // control point offset horizontal
@@ -633,8 +635,8 @@ export const canvas  = (socket) => {
         if (!emit) {
           return;
         }
-        var canv_w = canvaso.width;
-        var canv_h = canvaso.height;
+        //var canv_w = canvaso.width;
+        //var canv_h = canvaso.height;
 
         socket.emit('ellipsedraw', {
           x: x,
@@ -650,8 +652,6 @@ export const canvas  = (socket) => {
 
 
       function onDrawEllipse(data) {
-        var w = canvaso.width;
-        var h = canvaso.height;
         drawEllipse(data.x, data.y, data.w, data.h, data.color, data.lineThickness);
       }
 
@@ -716,7 +716,7 @@ export const canvas  = (socket) => {
       textContainer.appendChild(tmp_txt_ctn);
 
 
-      var onDrawTextBox = function (ev_x, ev_y, tool_x0, tool_y0) {
+     /* var onDrawTextBox = function (ev_x, ev_y, tool_x0, tool_y0) {
 
         //context.clearRect(0, 0, canvas.width, canvas.height); 
 
@@ -731,7 +731,7 @@ export const canvas  = (socket) => {
         textarea.style.height = height + 'px';
 
         textarea.style.display = 'block';
-      };
+      };*/
 
 
       function DrawText(fsize, ffamily, colorVal, textPosLeft, textPosTop, processed_lines, emit) {
@@ -754,13 +754,13 @@ export const canvas  = (socket) => {
         if (!emit) {
           return;
         }
-        var w = canvaso.width;
-        var h = canvaso.height;
+        // var w = canvaso.width;
+        // var h = canvaso.height;
 
         socket.emit('textdraw', {
           fsize: fsize,
           ffamily: ffamily,
-          colorVal: colorVal,
+          colorVal: colorPicked,
           textPosLeft: textPosLeft,
           textPosTop: textPosTop,
           processed_linesArray: processed_lines
@@ -769,8 +769,6 @@ export const canvas  = (socket) => {
       }
 
       function onTextDraw(data) {
-        var w = canvaso.width;
-        var h = canvaso.height;
         DrawText(data.fsize, data.ffamily, data.colorVal, data.textPosLeft, data.textPosTop, data.processed_linesArray);
       }
 
@@ -834,7 +832,7 @@ export const canvas  = (socket) => {
                 tmp_txt_ctn.style.display = 'block';
 
                 var width = tmp_txt_ctn.offsetWidth;
-                var height = tmp_txt_ctn.offsetHeight;
+                //var height = tmp_txt_ctn.offsetHeight;
 
                 tmp_txt_ctn.style.position = '';
                 tmp_txt_ctn.style.visibility = '';

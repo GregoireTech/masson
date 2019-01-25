@@ -51,8 +51,19 @@ const generateId = () => {
 const createTeacher = (socket, data) => {
     const newTeacher = new Teacher(data.firstName, data.lastName);
     teachers[newTeacher.name] = newTeacher;
-    io.to(`${socket.id}`).emit('teacherCreated', data);
+    io.of('/rooms').to(socket['room']).emit('teacherCreated', data);
 }
+
+const sendRoomLines = (socket, lines) => {
+    let i = 0;
+    for (line of lines){
+        if(i === 0) console.log(line.type, '   ' , line.data);
+        io.to(`${socket.id}`).emit('lineTest', line.data);
+        i++;
+        console.log('sent 1 line')
+    };
+    console.log(i + 'lines sent to: ' + socket.id);
+};
 
 function onConnection(socket) {
     console.log(socket.id, 'user connected');
@@ -101,11 +112,10 @@ function connectToRoom(socket) {
             if (rooms[data.room].pin === data.pin) {
                 if (rooms[data.room].usersCounter < 2) {
                     socket.join(data.room);
+                    console.log(socket['room'], 'connected', socket.id);
                     socket['room'] = data.room;
-                    console.log(socket['room'], 'connected');
-                    socket.emit('getRoomLines', {
-                        lines: rooms[data.room].lines
-                    });
+                    sendRoomLines(socket, rooms[data.room].lines);
+                    
                 } else {
                     console.log('too many users');
                 };
