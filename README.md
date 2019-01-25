@@ -1,10 +1,18 @@
-Greg Workflow
 
+/** TODO
 
-Mandatory
-1. Include WebRTC 
-2. Create Rooms
+Thursday
+- Color picker (react color picker?)
+- query params
 
-3. Save rooms
-4. Draw rooms on new user
-5. upload imgs
+Friday
+- join room 
+- Resize canvas
+- Draw rooms on new user
+- invite by email
+
+Weekend
+- WEBRTC
+    - cross browser
+    - file transfer
+

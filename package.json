@@ -1,8 +1,7 @@
 {
   "name": "whiteboard",
   "version": "1.0.0",
-  "description": "A collaborative whiteboard using socket.io",
-  "main": "index.js",
+  "main": "server/server.js",
   "keywords": [
     "socket.io",
     "whiteboard"
@@ -12,9 +11,9 @@
     "socket.io": "latest"
   },
   "scripts": {
-    "start": "node index.js", 
-    "dev": "nodemon index.js"
+    "start": "node server/server.js", 
+    "dev": "nodemon server/server.js"
   },
-  "author": "Devan",
+  "author": "GregoireTech",
   "license": "MIT"
 }
