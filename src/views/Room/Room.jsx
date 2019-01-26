@@ -31,7 +31,7 @@ class Room extends Component {
         const pin = params.pin;
         //Connect to room
         const io = require('socket.io-client');
-        const socket = io(`${endpoints.dev}rooms`);
+        const socket = io(`${endpoints.prod}rooms`);
         // Setup actions if join succeeds OK
         socket.on('joinSuccess', () => {
             console.log('joinSuccess');

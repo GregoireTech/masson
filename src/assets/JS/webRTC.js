@@ -4,6 +4,17 @@ const webRTC = (socket) => {
 
     const init = () => {
 
+        const videoBtn = document.getElementById('camera');
+        videoBtn.addEventListener('click', () => {
+            const previous = videoSetting;
+            videoSetting = !previous;
+        });
+        const audioBtn = document.getElementById('microphone');
+        audioBtn.addEventListener('click', () => {
+            const previous = audioSetting;
+            audioSetting = !previous;
+        });
+
         const displayError = (error) => console.log(error);
 
 
