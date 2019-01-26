@@ -1,10 +1,6 @@
+export const canvas  = (socket) => {
 
-export const canvas  = (socket, colorPicked) => {
 
-
-  socket.on('lineTest', (data) =>  {
-    console.log('lineTest', data)
-  });
 
   // This object holds the implementation of each drawing tool.
   var tools = {};
@@ -12,6 +8,7 @@ export const canvas  = (socket, colorPicked) => {
   var lineWidthPicked;
   var SelectedFontFamily;
   var SelectedFontSize;
+  var colorPicked;
 
 
   function getValue(elName){
@@ -33,6 +30,7 @@ export const canvas  = (socket, colorPicked) => {
 
       function init() {
         // Find the canvas element.
+        //jscolor();
         canvaso = document.getElementById('imageView');
         if (!canvaso) {
           alert('Error: I cannot find the canvas element!');
@@ -73,8 +71,8 @@ export const canvas  = (socket, colorPicked) => {
         //tool_select.addEventListener('change', ev_tool_change, false);
 
         //Choose colour picker
-        //colorPicked = colorProp;
-        //valueChangeListen('colour-picker', function(){ colorPicked = getValue('colour-picker')});
+        colorPicked = document.getElementById('colour-picker').value;
+        valueChangeListen('colour-picker', function(){ colorPicked = getValue('colour-picker')});
 
         //Choose line Width
         lineWidthPicked = getValue('line-Width');
@@ -266,9 +264,9 @@ export const canvas  = (socket, colorPicked) => {
         context.moveTo(x0, y0);
         context.lineTo(x1, y1);
         if (color)
-          context.strokeStyle = "#" + color;
+          context.strokeStyle =  color;
         else
-          context.strokeStyle = "#" + colorPicked;
+          context.strokeStyle =  colorPicked;
         if (linewidth)
           context.lineWidth = linewidth;
         else
@@ -343,9 +341,9 @@ export const canvas  = (socket, colorPicked) => {
 
         context.clearRect(0, 0, canvas.width, canvas.height);
         if (color)
-          context.strokeStyle = "#" + color;
+          context.strokeStyle =  color;
         else
-          context.strokeStyle = "#" + colorPicked;
+          context.strokeStyle =  colorPicked;
         if (linewidth)
           context.lineWidth = linewidth;
         else
@@ -424,15 +422,14 @@ export const canvas  = (socket, colorPicked) => {
       };
       //Lines
       function drawLines(x0, y0, x1, y1, color, linewidth, emit) {
-        console.log('line:', color)
         context.clearRect(0, 0, canvas.width, canvas.height);
         context.beginPath();
         context.moveTo(x0, y0);
         context.lineTo(x1, y1);
         if (color)
-          context.strokeStyle = "#" + color;
+          context.strokeStyle =  color;
         else
-          context.strokeStyle = "#" + colorPicked;
+          context.strokeStyle =  colorPicked;
         if (linewidth)
           context.lineWidth = linewidth;
         else
@@ -519,9 +516,9 @@ export const canvas  = (socket, colorPicked) => {
         // context.arc(x, y, 5, 0, Math.PI*2, false);
         context.closePath();
         if (color)
-          context.strokeStyle = "#" + color;
+          context.strokeStyle =  color;
         else
-          context.strokeStyle = "#" + colorPicked;
+          context.strokeStyle =  colorPicked;
         if (linewidth)
           context.lineWidth = linewidth;
         else
@@ -622,9 +619,9 @@ export const canvas  = (socket, colorPicked) => {
         context.closePath();
 
         if (color)
-          context.strokeStyle = "#" + color;
+          context.strokeStyle =  color;
         else
-          context.strokeStyle = "#" + colorPicked;
+          context.strokeStyle =  colorPicked;
         if (linewidth)
           context.lineWidth = linewidth;
         else
@@ -737,7 +734,7 @@ export const canvas  = (socket, colorPicked) => {
       function DrawText(fsize, ffamily, colorVal, textPosLeft, textPosTop, processed_lines, emit) {
         context.font = fsize + ' ' + ffamily;
         context.textBaseline = 'top';
-        context.fillStyle = "#" + colorVal;
+        context.fillStyle =  colorVal;
 
         for (var n = 0; n < processed_lines.length; n++) {
           var processed_line = processed_lines[n];
@@ -805,7 +802,7 @@ export const canvas  = (socket, colorPicked) => {
           textarea.style.height = height + 'px';
 
           textarea.style.display = 'block';
-          textarea.style.color = "#" + colorPicked;
+          textarea.style.color =  colorPicked;
           textarea.style.font = SelectedFontSize + 'px' + ' ' + SelectedFontFamily;
         };
 

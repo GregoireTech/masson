@@ -1,9 +1,8 @@
 import React from 'react';
-//import ColorPicker from 'react-input-color';
+
 import './tools.css';
 
 const tools = (props) => {
-
 
     const toolList = [
         {
@@ -55,12 +54,8 @@ const tools = (props) => {
                 type='color' 
                 value={props.color}
                 onChange={props.colorChanged}
-            />
-                {/* <ColorPicker 
-            value={props.color}
-            defaultValue="#345678"
-            onChange={props.colorChange}
-            /> */}
+            /> 
+
             </span>
             <span className="form-group" >
                 Thickness:
