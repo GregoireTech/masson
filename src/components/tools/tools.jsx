@@ -47,8 +47,9 @@ const tools = (props) => {
     return(
         <div className="toolsContainer">
             {tools}
-            
-            <label htmlFor="colour">Colour : </label>
+            <span className="form-group" >
+            Colour :
+            <br/>
             <input 
                 id='colour-picker'
                 type='color' 
@@ -60,8 +61,10 @@ const tools = (props) => {
             defaultValue="#345678"
             onChange={props.colorChange}
             /> */}
+            </span>
             <span className="form-group" >
-                <label htmlFor="line-Width">Thickness: </label>
+                Thickness:
+                <br/>
                 <select className="form-control" id="line-Width">
                 <option>2</option>
                 <option>4</option>
@@ -73,7 +76,8 @@ const tools = (props) => {
                 </select>
             </span>
             <span className="form-group" >
-                <label htmlFor="draw-text-font-family">Font: </label>
+                Font:
+                <br/>
                 <select className="form-control" id="draw-text-font-family" defaultValue='Verdana'>
                 <option value="Arial">Arial</option>
                 <option value="Verdana">Verdana</option>
@@ -84,7 +88,8 @@ const tools = (props) => {
                 </select>
             </span>
             <span className="form-group" >
-                <label htmlFor="draw-text-font-size">Font Size: </label>
+                Font Size:
+                <br/>
                 <select className="form-control" id="draw-text-font-size" defaultValue='32'>
                 <option value="16">16 Px</option>
                 <option value="18">18 Px</option>

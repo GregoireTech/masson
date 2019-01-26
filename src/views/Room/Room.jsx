@@ -43,6 +43,8 @@ class Room extends Component {
                 loaded: true,
                 socket: socket
             });
+            socket.emit('getRoomLines');
+            console.log('getRoomLines');
         });
         // Setup actions if join fails
         socket.on('joinFail', error => {
@@ -56,6 +58,9 @@ class Room extends Component {
         };
         // Setup width & height of the canvas
         this.setCanvas();
+        if(this.state.loaded){
+                
+        }
         //window.addEventListener('resize', this.setCanvas.bind(this));
     };
     
@@ -76,9 +81,7 @@ class Room extends Component {
             width: canvasWidth,
             height: canvasHeight
         });
-        if(socket) {
-            socket.emit('getRoomLines');
-        }
+
     };
 
     changeColor(e){
