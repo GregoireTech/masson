@@ -35,7 +35,7 @@ class Room extends Component {
         const pin = params.pin;
         //Connect to room
         const io = require('socket.io-client');
-        const socket = io(`${endpoints.prod}rooms`);
+        const socket = io(`${endpoints.dev}rooms`);
         // Setup actions if join succeeds OK
         socket.on('joinSuccess', () => {
             console.log('joinSuccess');
@@ -86,6 +86,12 @@ class Room extends Component {
         this.setState({pickedColor: e.target.value});
     };
 
+    // validateEmail(){
+    //     const valid = EmailValidator.validate(this.state.email);
+    //     this.setState({validEmail: valid});
+    //     return valid;
+    // }
+
     sendInvite(){
         const guest = this.state.guest;
         console.log(guest);
@@ -93,9 +99,11 @@ class Room extends Component {
         if(guest && socket){
         socket.emit('inviteGuest', {email: guest});
         socket.on('inviteRes', (res) => {
-            alert(res);
+            console.log('email response:', res);
         });
-        } else alert('Il y a eu une erreur, merci de réessayer');
+        } else { 
+            alert('Il y a eu une erreur, merci de réessayer');
+        }
         this.setState({modal: false});
     };
 
@@ -127,6 +135,7 @@ class Room extends Component {
                     inputValue={this.state.guest}
                     closeModal={this.toggleModal.bind(this)}
                     sendInvite={this.sendInvite.bind(this)}
+                    valid={this.state.validEmail}
                 />
                 <Tools 
                     color={this.state.pickedColor} 
