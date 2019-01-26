@@ -1,0 +1,17 @@
+.startContainer {
+    width: 80%;
+    padding: 3rem 2rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: left;
+    background: white;
+}
+
+;
+
+.startContainer li {
+    list-style: none;
+    text-decoration: none;
+}
