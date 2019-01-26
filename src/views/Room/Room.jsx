@@ -10,6 +10,8 @@ import webRTC from '../../assets/JS/webRTC';
 import Tools from '../../components/tools/tools';
 import Canvas from '../../components/canvas/canvas';
 import Controls from '../../components/controls/controls';
+import Invite from '../../components/modal/modal';
+import Backdrop from '../../components/backdrop/backdrop';
 // Stylesheet
 import './Room.css';
 
@@ -21,7 +23,9 @@ class Room extends Component {
         height: null,
         roomName: 'greg',
         socket: null,
-        pickedColor: '#345678'
+        pickedColor: '#345678',
+        guest: null,
+        modal: false
     }
     
     componentDidMount() {
@@ -49,21 +53,19 @@ class Room extends Component {
             console.log('sending join request');
             socket.emit('join', {room: roomName, pin: pin});
             
-        }
+        };
         // Setup width & height of the canvas
         this.setCanvas();
         //window.addEventListener('resize', this.setCanvas.bind(this));
-
-
-    }
+    };
     
     componentDidUpdate() {
         if (this.state.loaded && this.state.socket) {
             const socket = this.state.socket;
             canvas(socket, this.state.pickedColor);
             webRTC(socket);
-        }
-    }
+        };
+    };
 
     setCanvas(){
         const socket = this.state.socket;
@@ -77,11 +79,36 @@ class Room extends Component {
         if(socket) {
             socket.emit('getRoomLines');
         }
-    }
+    };
 
     changeColor(e){
         console.log('change color to: ', e.target.value);
         this.setState({pickedColor: e.target.value});
+    };
+
+    sendInvite(){
+        const guest = this.state.guest;
+        console.log(guest);
+        const socket = this.state.socket;
+        if(guest && socket){
+        socket.emit('inviteGuest', {email: guest});
+        socket.on('inviteRes', (res) => {
+            alert(res);
+        });
+        } else alert('Il y a eu une erreur, merci de réessayer');
+        this.setState({modal: false});
+    };
+
+    guestInputChanged(e){
+        const email = e.target.value;
+        this.setState({guest: email});
+    }
+
+    toggleModal(){
+        const previous = this.state.modal;
+        this.setState({
+            modal: !previous
+        });
     }
 
     render() {
@@ -93,6 +120,14 @@ class Room extends Component {
         }
         return (
             <div className='globalContainer'>
+                <Backdrop click={this.toggleModal.bind(this)} show={this.state.modal} />
+                <Invite 
+                    show={this.state.modal}
+                    inputChanged={this.guestInputChanged.bind(this)} 
+                    inputValue={this.state.guest}
+                    closeModal={this.toggleModal.bind(this)}
+                    sendInvite={this.sendInvite.bind(this)}
+                />
                 <Tools 
                     color={this.state.pickedColor} 
                     colorChanged={this.changeColor.bind(this)} 
@@ -103,6 +138,7 @@ class Room extends Component {
                 <Controls 
                     teacher={this.teacher} 
                     student={this.student} 
+                    openModal={this.toggleModal.bind(this)}
                 />
             </div>
         );
