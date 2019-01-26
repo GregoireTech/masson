@@ -1,6 +1,8 @@
 // External modules
 import React, { Component } from 'react';
 import queryString from 'query-string';
+// Config
+import endpoints from '../../assets/config/endpoints.js';
 // Scripts
 import { canvas } from '../../assets/JS/canvas';
 import webRTC from '../../assets/JS/webRTC';
@@ -29,22 +31,28 @@ class Room extends Component {
         const pin = params.pin;
         //Connect to room
         const io = require('socket.io-client');
-        const socket = io('http://localhost:8080/rooms');
-        if (this.state.roomName && socket) {
-            socket.emit('join', {room: roomName, pin: pin});
-            socket.on('joinSuccess', () => {
-                this.setState({
-                    loaded: true,
-                    socket: socket
-                });
+        const socket = io(`${endpoints.dev}rooms`);
+        // Setup actions if join succeeds OK
+        socket.on('joinSuccess', () => {
+            console.log('joinSuccess');
+            this.setState({
+                loaded: true,
+                socket: socket
             });
-            socket.on('joinFail', error => {
-                console.log('error',error);
-            })
+        });
+        // Setup actions if join fails
+        socket.on('joinFail', error => {
+            alert(error);
+        });
+        // Send join request
+        if (socket) {
+            console.log('sending join request');
+            socket.emit('join', {room: roomName, pin: pin});
+            
         }
         // Setup width & height of the canvas
-        this.setCanvaSize();
-        //window.addEventListener('resize', this.setCanvaSize.bind(this));
+        this.setCanvas();
+        //window.addEventListener('resize', this.setCanvas.bind(this));
 
 
     }
@@ -57,7 +65,8 @@ class Room extends Component {
         }
     }
 
-    setCanvaSize(){
+    setCanvas(){
+        const socket = this.state.socket;
         const canvasContainer = document.getElementById('container');
         const canvasHeight = canvasContainer.offsetHeight;
         const canvasWidth = canvasContainer.offsetWidth;
@@ -65,6 +74,9 @@ class Room extends Component {
             width: canvasWidth,
             height: canvasHeight
         });
+        if(socket) {
+            socket.emit('getRoomLines');
+        }
     }
 
     changeColor(e){

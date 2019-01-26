@@ -3,6 +3,7 @@ import queryString from 'query-string';
 import './Start.css';
 import login from '../../assets/JS/login';
 import {Link} from 'react-router-dom';
+import endpoints from '../../assets/config/endpoints.js';
 
 
 
@@ -18,9 +19,8 @@ class Start extends Component {
 
     componentDidMount(){
         const params = queryString.parse(window.location.search);
-        console.log(params);
         const io = require('socket.io-client');
-        const socket = io('http://localhost:8080/');
+        const socket = io(`${endpoints.dev}`);
         login(
             {
                 addRoom: this.addRoomToList.bind(this), 
