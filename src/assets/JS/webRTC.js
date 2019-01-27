@@ -2,87 +2,52 @@ const webRTC = (socket) => {
     let videoSetting = true;
     let audioSetting = true;
 
-    const init = () => {
-
-        const videoBtn = document.getElementById('camera');
-        videoBtn.addEventListener('click', () => {
-            const previous = videoSetting;
-            videoSetting = !previous;
-        });
-        const audioBtn = document.getElementById('microphone');
-        audioBtn.addEventListener('click', () => {
-            const previous = audioSetting;
-            audioSetting = !previous;
-        });
-
-        const displayError = (error) => console.log(error);
 
 
-        const getBrowserId = () => {
-            var aKeys = ["MSIE", "Firefox", "Safari", "Chrome", "Opera"],
-                sUsrAg = window.navigator.userAgent,
-                nIdx = aKeys.length - 1;
+    const localConn = new RTCPeerConnection();
+    const remoteConn = new RTCPeerConnection();
 
-            for (nIdx; nIdx > -1 && sUsrAg.indexOf(aKeys[nIdx]) === -1; nIdx--);
-
-            return aKeys[nIdx];
+    localConn.onicecandidate = e => {
+        if (e.candidate) {
+            remoteConn.addIceCandidate(e.candidate);
         }
-
-        const getLocalVideo = (navigator, settings, success, fail) => {
-            switch (navigator) {
-                case "Chrome":
-                    return window.navigator.getUserMedia(settings, success, fail);
-                case "Firefox":
-                    return window.navigator.mediaDevices.getUserMedia(settings, success, fail);
-                case "Safari":
-                    return window.navigator.getUserMedia(settings, success, fail);
-                case "Opera":
-                    return window.navigator.getUserMedia(settings, success, fail);
-                case "MSIE":
-                    return window.navigator.getUserMedia(settings, success, fail);
-                default:
-                    return
-            }
-        }
-
-
-
-
-        // Start the script
-        const navigator = getBrowserId();
-        getLocalVideo(navigator, {
-                video: videoSetting,
-                audio: audioSetting
-
-            },
-            function onSuccess(myStream) {
-                const localVideo = document.getElementById('localVideo');
-                localVideo.srcObject = myStream;
-            },
-            displayError
-        );
-
-
     }
 
-    const getBrowserRTCConnectionObj = (nav) => {
-        var servers = null;
-        var pcConstraints = {
-            'optional': []
-        };
-        switch (nav) {
-            case "Chrome":
-                return new window.RTCPeerConnection(servers, pcConstraints);
-            case "Firefox":
-                return new window.mozRTCPeerConnection(servers, pcConstraints);
-            case "Safari":
-                return new window.webkitRTCPeerConnection(servers, pcConstraints);
-            case "Opera":
-                return new window.RTCPeerConnection(servers, pcConstraints);
-            case "MSIE":
-                return new window.msRTCPeerConnection(servers, pcConstraints);
-            default:
+    remoteConn.onicecandidate = e => {
+        if (e.candidate) {
+            localConn.addIceCandidate(e.candidate);
+        }
+    }
 
+    window.navigator.mediaDevices.getUserMedia({
+            video: true
+        })
+        .then(stream => {
+            document.getElementById('localVideo').srcObject = stream;
+            localConn.addStream(stream);
+            return localConn.createOffer();
+        })
+        .then(offer => {
+            localConn.setLocalDescription(new RTCSessionDescription(offer))
+        })
+        .then(() => {
+            remoteConn.setRemoteDescription(localConn.localDescription);
+        })
+        .then(() => remoteConn.createAnswer())
+        .then(answer => remoteConn.setLocalDescription(new RTCSessionDescription(answer)))
+        .then(() => localConn.setRemoteDescription(remoteConn.localDescription));
+
+    // remoteConn.onaddstream(() => {
+    //     console.log('ontrack');
+    //     //document.getElementById('remoteVideo').srcObject = e.streams[0];
+    // });
+    const remoteVideo = document.getElementById('remoteVideo')
+    
+    remoteConn.addEventListener('track', e => gotRemoteStream(e));
+    function gotRemoteStream(e) {
+        if (remoteVideo.srcObject !== e.streams[0]) {
+        remoteVideo.srcObject = e.streams[0];
+        console.log('pc2 received remote stream');
         }
     }
 
@@ -91,9 +56,37 @@ const webRTC = (socket) => {
 
 
 
+    // Set the video & audio buttons
+    const videoBtn = document.getElementById('camera');
+    videoBtn.addEventListener('click', () => {
+        const previous = videoSetting;
+        videoSetting = !previous;
+        console.log(videoSetting);
+    });
+    const audioBtn = document.getElementById('microphone');
+    audioBtn.addEventListener('click', () => {
+        const previous = audioSetting;
+        audioSetting = !previous;
+        console.log(audioSetting);
+    });
 
-    init();
+
 
 };
 
 export default webRTC;
+
+
+
+// const getBrowserId = () => {
+//     var aKeys = ["MSIE", "Firefox", "Safari", "Chrome", "Opera"],
+//         sUsrAg = window.navigator.userAgent,
+//         nIdx = aKeys.length - 1;
+
+//     for (nIdx; nIdx > -1 && sUsrAg.indexOf(aKeys[nIdx]) === -1; nIdx--);
+
+//     return aKeys[nIdx];
+// }
+
+// // Start the script
+// const navigator = getBrowserId();

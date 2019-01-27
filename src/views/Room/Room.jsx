@@ -58,8 +58,8 @@ class Room extends Component {
         };
         // Setup width & height of the canvas
         this.setCanvas();
-        if(this.state.loaded){
-                
+        if(socket){
+            webRTC(socket);
         }
         //window.addEventListener('resize', this.setCanvas.bind(this));
     };
