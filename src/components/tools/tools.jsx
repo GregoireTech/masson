@@ -51,9 +51,8 @@ const tools = (props) => {
             <br/>
             <input 
                 id='colour-picker'
-                type='color' 
-                value={props.color}
-                onChange={props.colorChanged}
+                type='color'
+                defaultValue='#345678' 
             /> 
 
             </span>

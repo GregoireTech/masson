@@ -15,3 +15,6 @@
 /.firebase
 .firebasesrc
 firebase.json
+src/assets/config/servers.js
+
+

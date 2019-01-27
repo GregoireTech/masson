@@ -71,7 +71,7 @@ export const canvas  = (socket) => {
         //tool_select.addEventListener('change', ev_tool_change, false);
 
         //Choose colour picker
-        colorPicked = document.getElementById('colour-picker').value;
+        colorPicked = getValue('colour-picker');
         valueChangeListen('colour-picker', function(){ colorPicked = getValue('colour-picker')});
 
         //Choose line Width

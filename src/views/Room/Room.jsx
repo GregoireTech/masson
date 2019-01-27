@@ -7,6 +7,7 @@ import endpoints from '../../assets/config/endpoints.js';
 import { canvas } from '../../assets/JS/canvas';
 import {initiator} from '../../assets/JS/initiator';
 import {receiver} from '../../assets/JS/receiver';
+import webRTC from '../../assets/JS/webRTC';
 // React components
 import Tools from '../../components/tools/tools';
 import Canvas from '../../components/canvas/canvas';
@@ -24,10 +25,9 @@ class Room extends Component {
         height: null,
         roomName: 'greg',
         socket: null,
-        pickedColor: '#345678',
         guest: null,
         modal: false,
-        visioStatus: 0
+        initiator: null
     }
     
     componentDidMount() {
@@ -47,7 +47,7 @@ class Room extends Component {
                 this.setState({
                     loaded: true,
                     socket: socket,
-                    visioStatus: data.visioStatus
+                    initiator: data.roomReady
                 });
                 socket.emit('getRoomLines');
                 console.log('getRoomLines');
@@ -62,6 +62,7 @@ class Room extends Component {
             console.log('sending join request');
             socket.emit('join', {room: roomName, pin: pin});
             
+            
         };
         // Setup width & height of the canvas
         this.setCanvas();
@@ -69,9 +70,19 @@ class Room extends Component {
     };
     
     componentDidUpdate() {
+        console.log('component updated');
         if (this.state.loaded && this.state.socket) {
             const socket = this.state.socket;
-            canvas(socket, this.state.pickedColor);
+            canvas(socket);
+            if(this.state.initiator !== null){
+                webRTC(socket, this.state.initiator);
+            } 
+            socket.on('peerLeft', () => {
+                console.log('peer disconnected');
+                this.setState({initiator: false});
+                this.forceUpdate();
+                //window.location.reload();
+            });
         };
     };
 
@@ -86,17 +97,6 @@ class Room extends Component {
         });
 
     };
-
-    changeColor(e){
-        console.log('change color to: ', e.target.value);
-        this.setState({pickedColor: e.target.value});
-    };
-
-    // validateEmail(){
-    //     const valid = EmailValidator.validate(this.state.email);
-    //     this.setState({validEmail: valid});
-    //     return valid;
-    // }
 
     sendInvite(){
         const guest = this.state.guest;
@@ -125,28 +125,7 @@ class Room extends Component {
         });
     }
 
-    toggleVisio(){
-        const socket = this.state.socket;
-        if (socket){
-            switch(this.state.visioStatus){
-                case 0:
-                    this.setState({visioStatus: 2});
-                    socket.emit('setVisioStatus', {status: 1});
-                    receiver(socket);
-                    break;
-                case 1: 
-                    this.setState({visioStatus: 2});
-                    initiator(socket);
-                    break;
-                case 2:
-                    this.setState({visioStatus: 0});
-                    socket.emit('setVisioStatus', {status: 0});
-                    break;
-                default:
-                    return;
-            }
-        }
-    }
+
     render() {
         let canvas;
         if (this.state.loaded) {
@@ -165,10 +144,7 @@ class Room extends Component {
                     sendInvite={this.sendInvite.bind(this)}
                     valid={this.state.validEmail}
                 />
-                <Tools 
-                    color={this.state.pickedColor} 
-                    colorChanged={this.changeColor.bind(this)} 
-                />
+                <Tools />
                 <div id="container">
                     {canvas}
                 </div>
@@ -176,8 +152,6 @@ class Room extends Component {
                     teacher={this.teacher} 
                     student={this.student} 
                     openModal={this.toggleModal.bind(this)}
-                    visio={this.state.visioStatus}
-                    toggleVisio={this.toggleVisio.bind(this)}
                 />
             </div>
         );

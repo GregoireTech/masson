@@ -1,4 +1,9 @@
+import serversList from '../config/servers';
+const servers = [];
+
 export const initiator = (socket) => {
+
+    console.log('starting initiator');
     let localConn = {};
     const localVideo = document.getElementById('localVideo');
     const remoteVideo = document.getElementById('remoteVideo');
@@ -14,7 +19,7 @@ export const initiator = (socket) => {
         audio: true,
         video: true
     }, function (localStream) {
-        localConn = new RTCPeerConnection ();
+        localConn = new RTCPeerConnection (servers);
         localConn.addStream(localStream);
     
         localVideo.srcObject = localStream;
@@ -81,12 +86,12 @@ export const initiator = (socket) => {
         
     });
 
-    document.getElementById('visioBtn').addEventListener('click', () => {
-        if (localConn) {
-            localConn.close();
-        }
-        localConn = {};
-    });
+    // document.getElementById('visioBtn').addEventListener('click', () => {
+    //     if (localConn) {
+    //         localConn.close();
+    //     }
+    //     localConn = {};
+    // });
 
 };
 

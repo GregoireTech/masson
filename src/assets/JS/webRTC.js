@@ -1,92 +1,214 @@
-const webRTC = (socket) => {
-    let videoSetting = true;
-    let audioSetting = true;
+import serversList from '../config/servers';
+const servers = [];
 
+const webRTC = (socket, initiator) => {
 
+    if (initiator) {
+        console.log('starting initiator');
+        let localConn = {};
+        const localVideo = document.getElementById('localVideo');
+        const remoteVideo = document.getElementById('remoteVideo');
 
-    const localConn = new RTCPeerConnection();
-    const remoteConn = new RTCPeerConnection();
+        function gotRemoteStream(e) {
+            if (remoteVideo.srcObject !== e.streams[0]) {
+                remoteVideo.srcObject = e.streams[0];
+                console.log('initiator got remote stream');
+            }
+        };
 
-    localConn.onicecandidate = e => {
-        if (e.candidate) {
-            remoteConn.addIceCandidate(e.candidate);
-        }
-    }
-
-    remoteConn.onicecandidate = e => {
-        if (e.candidate) {
-            localConn.addIceCandidate(e.candidate);
-        }
-    }
-
-    window.navigator.mediaDevices.getUserMedia({
+        window.navigator.getUserMedia({
+            audio: true,
             video: true
-        })
-        .then(stream => {
-            document.getElementById('localVideo').srcObject = stream;
-            localConn.addStream(stream);
-            return localConn.createOffer();
-        })
-        .then(offer => {
-            localConn.setLocalDescription(new RTCSessionDescription(offer))
-        })
-        .then(() => {
-            remoteConn.setRemoteDescription(localConn.localDescription);
-        })
-        .then(() => remoteConn.createAnswer())
-        .then(answer => remoteConn.setLocalDescription(new RTCSessionDescription(answer)))
-        .then(() => localConn.setRemoteDescription(remoteConn.localDescription));
+        }, function (localStream) {
+            localConn = new RTCPeerConnection(servers);
+            localConn.addStream(localStream);
 
-    // remoteConn.onaddstream(() => {
-    //     console.log('ontrack');
-    //     //document.getElementById('remoteVideo').srcObject = e.streams[0];
-    // });
-    const remoteVideo = document.getElementById('remoteVideo')
-    
-    remoteConn.addEventListener('track', e => gotRemoteStream(e));
-    function gotRemoteStream(e) {
-        if (remoteVideo.srcObject !== e.streams[0]) {
-        remoteVideo.srcObject = e.streams[0];
-        console.log('pc2 received remote stream');
+            localVideo.srcObject = localStream;
+            // display remote's screensharing
+            localConn.addEventListener('track', gotRemoteStream);
+
+            localConn.onicecandidate = function (evt) {
+                if (evt.candidate) {
+
+                    var lightCandidate = {
+                        sdpMid: evt.candidate.sdpMid,
+                        sdpMLineIndex: evt.candidate.sdpMLineIndex,
+                        candidate: evt.candidate.candidate
+                    }
+
+                    // send ice local's iceCandidate to remote
+                    console.log('sent ice candidate')
+                    socket.emit('CANDIDATE_WEB_RTC_INIT', {
+                        "candidate": lightCandidate
+                    });
+                }
+            };
+
+            localConn.createOffer(function (desc) {
+                // desc is typeof RTCSessionDescription wich contains local's session
+                localConn.setLocalDescription(desc);
+
+                // send desc to remote
+                console.log('send desc');
+                socket.emit('ASK_WEB_RTC', JSON.stringify(desc));
+
+            }, function (err) {
+                console.error(err);
+            }, {
+                offerToReceiveAudio: 1,
+                offerToReceiveVideo: 1
+            });
+
+        }, function (e) {
+            console.error("You are not allow navigator use device", e);
+        });
+
+
+
+
+        socket.on('CANDIDATE_WEB_RTC_REC', function (candidate) {
+            // var candidate = JSON.parse(candidate);
+
+            console.log('got candidate');
+            localConn.addIceCandidate(new RTCIceCandidate(candidate.candidate),
+                function () {
+                    console.log('AddIceCandidate success!');
+                },
+                function (err) {
+                    console.error('Error AddIceCandidate');
+                    console.error(err);
+                }
+            );
+        });
+
+        socket.on('RESPONSE_WEB_RTC', function (remoteDesc) {
+            console.log('got response');
+            localConn.setRemoteDescription(new RTCSessionDescription(remoteDesc));
+
+        });
+
+
+
+    } else {
+        const remoteVideo = document.getElementById('remoteVideo');
+
+        let remoteTempDesc = {};
+        let remoteTempIceCandidates = [];
+
+        let localConn = {};
+
+
+        function gotDescription(localDesc) {
+            localConn.setLocalDescription(localDesc,
+                function () {
+                    // isAcceptedOffer = true;
+                    registerIceCandidate();
+                    // send desc to remote
+                    socket.emit('RESPONSE_WEB_RTC', localDesc);
+                },
+                function (err) {
+                    console.error(err);
+                });
         }
+
+
+        function registerIceCandidate() {
+            for (var i = 0; i < remoteTempIceCandidates.length; i++) {
+                localConn.addIceCandidate(
+                    new RTCIceCandidate(remoteTempIceCandidates[i]),
+                    function () {
+                        console.log('AddIceCandidate success!');
+                    },
+                    function (err) {
+                        console.error('Error AddIceCandidate');
+                        console.error(err);
+                    });
+            }
+        }
+
+
+        function sentIceCandidates(evt) {
+            if (evt.candidate) {
+                var lightCandidate = {
+                    sdpMid: evt.candidate.sdpMid,
+                    sdpMLineIndex: evt.candidate.sdpMLineIndex,
+                    candidate: evt.candidate.candidate
+                }
+                socket.emit('CANDIDATE_WEB_RTC_REC', {
+                    "candidate": lightCandidate
+                });
+            }
+        };
+
+        function gotRemoteStream(e) {
+            if (remoteVideo.srcObject !== e.streams[0]) {
+                remoteVideo.srcObject = e.streams[0];
+                console.log('receiver got remote stream');
+            }
+        };
+
+        function displayError(error) {
+            console.error(error);
+        }
+
+
+
+        function acceptOffer() {
+            localConn = new RTCPeerConnection(servers);
+            const localVideo = document.getElementById('localVideo');
+
+            window.navigator.getUserMedia({
+                audio: true,
+                video: true
+            }, function (myStream) {
+
+                localVideo.srcObject = myStream;
+                localConn.addStream(myStream);
+
+                // video = attachMediaStream(video, myStream);
+                // event to send local's iceCandaide to remote
+                localConn.onicecandidate = sentIceCandidates;
+
+                // display remote's video stream
+                localConn.addEventListener('track', gotRemoteStream);
+
+                // add remote's description
+                localConn.setRemoteDescription(
+                    new RTCSessionDescription(remoteTempDesc),
+                    function () {
+                        localConn.createAnswer(gotDescription, displayError);
+                    }, displayError);
+
+            }, displayError);
+        }
+
+        // document.getElementById('visioBtn').addEventListener('click', () => {
+        //     if (localConn) {
+        //         localConn.close();
+        //     }
+        //     localConn = {};
+        // });
+
+        ///////////////////////////////////////////////////////////////////////
+
+        socket.on('CANDIDATE_WEB_RTC_REC', function (candidate) {
+            console.log('got web candidate');
+            remoteTempIceCandidates.push(candidate.candidate);
+        });
+
+
+        socket.on('ASK_WEB_RTC', function (remoteDesc) {
+            console.log('ask_web_rtc');
+            remoteTempDesc = JSON.parse(remoteDesc);
+            acceptOffer();
+        });
+
+
+
     }
-
-
-
-
-
-
-    // Set the video & audio buttons
-    const videoBtn = document.getElementById('camera');
-    videoBtn.addEventListener('click', () => {
-        const previous = videoSetting;
-        videoSetting = !previous;
-        console.log(videoSetting);
-    });
-    const audioBtn = document.getElementById('microphone');
-    audioBtn.addEventListener('click', () => {
-        const previous = audioSetting;
-        audioSetting = !previous;
-        console.log(audioSetting);
-    });
 
 
 
 };
 
 export default webRTC;
-
-
-
-// const getBrowserId = () => {
-//     var aKeys = ["MSIE", "Firefox", "Safari", "Chrome", "Opera"],
-//         sUsrAg = window.navigator.userAgent,
-//         nIdx = aKeys.length - 1;
-
-//     for (nIdx; nIdx > -1 && sUsrAg.indexOf(aKeys[nIdx]) === -1; nIdx--);
-
-//     return aKeys[nIdx];
-// }
-
-// // Start the script
-// const navigator = getBrowserId();
