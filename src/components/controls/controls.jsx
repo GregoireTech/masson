@@ -50,6 +50,14 @@ const controls = (props) => {
             );    
         }
     });
+    let visioBtnText;
+    if (props.visio === 0){
+        visioBtnText = 'Start visio'
+    } else if (props.visio === 1) {
+        visioBtnText = 'Accept visio'; 
+    } else if (props.visio === 2) {
+        visioBtnText = 'Stop Visio';
+    }
 
     return(
         <div className="controlsContainer">
@@ -58,6 +66,7 @@ const controls = (props) => {
             </ul>
             <video autoPlay id="remoteVideo"></video>
             <video autoPlay muted id="localVideo"></video>
+            <button id='visioBtn' onClick={props.toggleVisio} className='btn visioBtn'>{visioBtnText}</button>
         </div>
     );
 };

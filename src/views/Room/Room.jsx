@@ -5,7 +5,8 @@ import queryString from 'query-string';
 import endpoints from '../../assets/config/endpoints.js';
 // Scripts
 import { canvas } from '../../assets/JS/canvas';
-import webRTC from '../../assets/JS/webRTC';
+import {initiator} from '../../assets/JS/initiator';
+import {receiver} from '../../assets/JS/receiver';
 // React components
 import Tools from '../../components/tools/tools';
 import Canvas from '../../components/canvas/canvas';
@@ -25,7 +26,8 @@ class Room extends Component {
         socket: null,
         pickedColor: '#345678',
         guest: null,
-        modal: false
+        modal: false,
+        visioStatus: 0
     }
     
     componentDidMount() {
@@ -35,32 +37,34 @@ class Room extends Component {
         const pin = params.pin;
         //Connect to room
         const io = require('socket.io-client');
-        const socket = io(`${endpoints.prod}rooms`);
-        // Setup actions if join succeeds OK
-        socket.on('joinSuccess', () => {
-            console.log('joinSuccess');
-            this.setState({
-                loaded: true,
-                socket: socket
-            });
-            socket.emit('getRoomLines');
-            console.log('getRoomLines');
-        });
-        // Setup actions if join fails
-        socket.on('joinFail', error => {
-            alert(error);
-        });
+        const socket = io(`${endpoints.dev}rooms`);
+
         // Send join request
         if (socket) {
+            // Setup actions if join succeeds OK
+            socket.on('joinSuccess', (data) => {
+                console.log('joinSuccess');
+                this.setState({
+                    loaded: true,
+                    socket: socket,
+                    visioStatus: data.visioStatus
+                });
+                socket.emit('getRoomLines');
+                console.log('getRoomLines');
+                });
+            // Setup actions if join fails
+            socket.on('joinFail', error => {
+                alert(error);
+            });
+            socket.on('setVisioStatus', data => {
+                this.setState({visioStatus: data.status});
+            })
             console.log('sending join request');
             socket.emit('join', {room: roomName, pin: pin});
             
         };
         // Setup width & height of the canvas
         this.setCanvas();
-        if(socket){
-            webRTC(socket);
-        }
         //window.addEventListener('resize', this.setCanvas.bind(this));
     };
     
@@ -68,7 +72,6 @@ class Room extends Component {
         if (this.state.loaded && this.state.socket) {
             const socket = this.state.socket;
             canvas(socket, this.state.pickedColor);
-            webRTC(socket);
         };
     };
 
@@ -122,6 +125,28 @@ class Room extends Component {
         });
     }
 
+    toggleVisio(){
+        const socket = this.state.socket;
+        if (socket){
+            switch(this.state.visioStatus){
+                case 0:
+                    this.setState({visioStatus: 2});
+                    socket.emit('setVisioStatus', {status: 1});
+                    receiver(socket);
+                    break;
+                case 1: 
+                    this.setState({visioStatus: 2});
+                    initiator(socket);
+                    break;
+                case 2:
+                    this.setState({visioStatus: 0});
+                    socket.emit('setVisioStatus', {status: 0});
+                    break;
+                default:
+                    return;
+            }
+        }
+    }
     render() {
         let canvas;
         if (this.state.loaded) {
@@ -151,6 +176,8 @@ class Room extends Component {
                     teacher={this.teacher} 
                     student={this.student} 
                     openModal={this.toggleModal.bind(this)}
+                    visio={this.state.visioStatus}
+                    toggleVisio={this.toggleVisio.bind(this)}
                 />
             </div>
         );
