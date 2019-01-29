@@ -2,8 +2,9 @@ import React, {Component} from 'react';
 import queryString from 'query-string';
 import './Start.css';
 import login from '../../assets/JS/login';
-import {Link} from 'react-router-dom';
 import endpoints from '../../assets/config/endpoints.js';
+import Header from '../../components/header/header';
+import Table from '../../components/table/table';
 
 
 
@@ -45,33 +46,11 @@ class Start extends Component {
 
 
     render(){
-        let rooms;
-        if (this.state.roomList !== []){
-            rooms = this.state.roomList.map((room, index) => {
-                return (
-                    <div className="room" key={index} >
-                        <p className='roomName'>{room.name}
-                            <Link to={`/rooms/?${room.string}`} >
-                                <button className='btn joinBtn'>Rejoindre</button>
-                            </Link>
-                        </p>
-                    </div>
-                );
-            });
-        } else {
-            rooms = (<div className="room">Il n'y a pas encore de rooms, créez-en une.</div> );
-        }
+        
         return(
             <div className='startContainer'>
-                <h2>Whiteboard collaboratif des Cours Masson</h2>
-                <p>Rejoignez l'une des rooms ci-dessous ou créez-en une.
-                    <button className='createBtn btn' onClick={this.createRoom.bind(this)}>Créer!</button> 
-                </p>
-                <div className='roomsContainer'>
-                    <ul className='roomList'>
-                        {rooms}
-                    </ul>
-                </div>
+                <Header create={this.createRoom.bind(this)} dashboardUrl='' />
+                <Table roomList={this.state.roomList} />
             </div>
         );
     };

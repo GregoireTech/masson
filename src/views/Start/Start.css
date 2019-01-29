@@ -1,15 +1,15 @@
 .startContainer {
-    width: 80%;
-    padding: 3rem 2rem;
+    width: 100vw;
+    padding: 2rem 0;
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: left;
     background: white;
+    min-height: 90vh;
+    margin: 5vh 0;
+    
+    text-align: center;
 }
 
-;
+
 
 .startContainer li {
     list-style: none;

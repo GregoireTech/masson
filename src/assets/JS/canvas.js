@@ -1,237 +1,266 @@
-export const canvas  = (socket) => {
+export const canvas = (socket) => {
 
 
 
-  // This object holds the implementation of each drawing tool.
-  var tools = {};
-  var textarea;
-  var lineWidthPicked;
-  var SelectedFontFamily;
-  var SelectedFontSize;
-  var colorPicked;
+    // This object holds the implementation of each drawing tool.
+    var tools = {};
+    var textarea;
+    var lineWidthPicked;
+    var SelectedFontFamily;
+    var SelectedFontSize;
+    var colorPicked;
 
 
-  function getValue(elName){
-    return document.getElementById(elName).value;
-  }
+    function getValue(elName) {
+      return document.getElementById(elName).value;
+    }
 
-  function valueChangeListen(elName, callback){
-    document.getElementById(elName).addEventListener('change', callback);
-  };
-
-
-  // Keep everything in anonymous function, called on window load.
-
-      var canvas, context, canvaso, contexto;
-
-      // The active tool instance.
-      var tool;
-      var tool_default = 'pencil';
-
-      function init() {
-        // Find the canvas element.
-        //jscolor();
-        canvaso = document.getElementById('imageView');
-        if (!canvaso) {
-          alert('Error: I cannot find the canvas element!');
-          return;
-        }
-
-        if (!canvaso.getContext) {
-          alert('Error: no canvas.getContext!');
-          return;
-        }
-
-        // Get the 2D canvas context.
-        contexto = canvaso.getContext('2d');
-        if (!contexto) {
-          alert('Error: failed to getContext!');
-          return;
-        }
-
-        // Add the temporary canvas.
-        var container = document.getElementById('container');
-        canvas = document.createElement('canvas');
-        if (!canvas) {
-          alert('Error: I cannot create a new canvas element!');
-          return;
-        }
-
-        canvas.id = 'imageTemp';
-        canvas.width = canvaso.width;
-        canvas.height = canvaso.height;
-        container.appendChild(canvas);
-
-        context = canvas.getContext('2d');
-
-        // Get the tool select input.
-        // var tool_select = document.getElementById('dtool');
-        var tool_select = document.getElementById('pencil-button');
-
-        //tool_select.addEventListener('change', ev_tool_change, false);
-
-        //Choose colour picker
-        colorPicked = getValue('colour-picker');
-        valueChangeListen('colour-picker', function(){ colorPicked = getValue('colour-picker')});
-
-        //Choose line Width
-        lineWidthPicked = getValue('line-Width');
-        valueChangeListen('line-Width', function(){lineWidthPicked = getValue('line-Width')});
-
-        //SelectedFontFamily
-        SelectedFontFamily = getValue('draw-text-font-family');
-        valueChangeListen('draw-text-font-family', function(){SelectedFontFamily = getValue('draw-text-font-family')});
-
-        //SelectedFontSize
-        SelectedFontSize = getValue('draw-text-font-size');
-        valueChangeListen('draw-text-font-size', function(){SelectedFontSize= getValue('draw-text-font-size')});
-        
-        // Activate the default tool.
-        if (tools[tool_default]) {
-          tool = new tools[tool_default]();
-          tool_select.value = tool_default;
-        }
-
-        function pic_tool_click(pick) {
-          if (tools[pick.alt]) {
-            tool = new tools[pick.alt]();
-          }
-        }
-
-        document.getElementById("pencil-button").addEventListener('click', function () {
-          pic_tool_click(this)
-        });
-
-        document.getElementById("rect-button").addEventListener('click', function () {
-          pic_tool_click(this)
-        });
-
-        document.getElementById("circle-button").addEventListener('click', function () {
-          pic_tool_click(this)
-        });
-
-        document.getElementById("ellipse-button").addEventListener('click', function () {
-          pic_tool_click(this)
-        });
-
-        document.getElementById("line-button").addEventListener('click', function () {
-          pic_tool_click(this)
-        });
-
-        document.getElementById("text-button").addEventListener('click', function () {
-          pic_tool_click(this)
-        });
+    function valueChangeListen(elName, callback) {
+      document.getElementById(elName).addEventListener('change', callback);
+    };
 
 
+    // Keep everything in anonymous function, called on window load.
 
-        //Draw Grids
-       /* function SketchGrid(gridSize) {
-          context.clearRect(0, 0, canvas.width, canvas.height);
+    var canvas, context, canvaso, contexto;
 
-          var w = canvas.width;
-          var h = canvas.height;
-          var gridWidth, gridColor;
+    // The active tool instance.
+    var tool;
+    var tool_default = 'pencil';
 
-
-          if (gridSize === "normal") {
-            gridWidth = 25;
-            gridColor = "#e7e8e8";
-          } else if (gridSize === "medium") {
-            gridWidth = 45;
-            gridColor = "#e7e8e8";
-          } else if (gridSize === "large") {
-            gridWidth = 65;
-            gridColor = "#e7e8e8";
-          } else if (gridSize === "nogrid") {
-            gridWidth = 25;
-            gridColor = "#fff"; //no grid
-          }
-
-          /**
-           * i is used for both x and y to draw
-           * a line every 5 pixels starting at
-           * .5 to offset the canvas edges
-          
-
-          context.beginPath(); //important draw new everytime
-
-          for (var i = .5; i < w || i < h; i += gridWidth) {
-            // draw horizontal lines
-            context.moveTo(i, 0);
-            context.lineTo(i, h);
-            // draw vertical lines
-            context.moveTo(0, i);
-            context.lineTo(w, i);
-          }
-          context.strokeStyle = gridColor;
-          //contexto.strokeStyle = 'hsla(0, 0%, 40%, .5)';
-          context.stroke();
-
-        }*/
-
-        /*var SelectedGrid = $("#draw-grid").val();
-    
-        SketchGrid(SelectedGrid)  //Calling drawing grid fn
-    
-        $("#draw-grid").change(function(){
-            var SelectedGrid = $("#draw-grid").val();
-            SketchGrid(SelectedGrid)  //Calling drawing grid fn
-        });*/
-
-
-        // limit the number of events per second
-        function throttle(callback, delay) {
-          var previousCall = new Date().getTime();
-          return function () {
-            var time = new Date().getTime();
-
-            if ((time - previousCall) >= delay) {
-              previousCall = time;
-              callback.apply(null, arguments);
-            }
-          };
-        }
-
-        // Attach the mousedown, mousemove and mouseup event listeners.
-        canvas.addEventListener('mousedown', ev_canvas, false);
-        //canvas.addEventListener('mousemove', ev_canvas, false);
-        canvas.addEventListener('mousemove', throttle(ev_canvas, 10), false);
-        canvas.addEventListener('mouseup', ev_canvas, false);
+    function init() {
+      // Find the canvas element.
+      //jscolor();
+      canvaso = document.getElementById('imageView');
+      if (!canvaso) {
+        alert('Error: I cannot find the canvas element!');
+        return;
       }
 
-      // The general-purpose event handler. This function just determines the mouse 
-      // position relative to the canvas element.
-      function ev_canvas(ev) {
-        //console.log(ev)
-        var CanvPos = canvas.getBoundingClientRect(); //Global Fix cursor position bug
-        if (ev.clientX || ev.clientX === 0) { // Firefox
-          //ev._x = ev.clientX;
-          ev._x = ev.clientX - CanvPos.left;
-          // ev._x = ev.layerX;
-          //ev._y = ev.clientY;
-          ev._y = ev.clientY - CanvPos.top;
-          //ev._y = ev.layerY;
-        } else if (ev.offsetX || ev.offsetX === 0) { // Opera
-          //ev._x = ev.offsetX;
-          //ev._y = ev.offsetY;
-        }
+      if (!canvaso.getContext) {
+        alert('Error: no canvas.getContext!');
+        return;
+      }
 
-        // Call the event handler of the tool.
-        var func = tool[ev.type];
-        if (func) {
-          func(ev);
+      // Get the 2D canvas context.
+      contexto = canvaso.getContext('2d');
+      if (!contexto) {
+        alert('Error: failed to getContext!');
+        return;
+      }
+
+      // Add the temporary canvas.
+      var container = document.getElementById('container');
+      canvas = document.createElement('canvas');
+      if (!canvas) {
+        alert('Error: I cannot create a new canvas element!');
+        return;
+      }
+
+      canvas.id = 'imageTemp';
+      canvas.width = canvaso.width;
+      canvas.height = canvaso.height;
+      container.appendChild(canvas);
+
+      context = canvas.getContext('2d');
+
+      // Get the tool select input.
+      // var tool_select = document.getElementById('dtool');
+      var tool_select = document.getElementById('pencil-button');
+
+      //tool_select.addEventListener('change', ev_tool_change, false);
+
+      //Choose colour picker
+      colorPicked = getValue('colour-picker');
+      valueChangeListen('colour-picker', function () {
+        colorPicked = getValue('colour-picker')
+      });
+
+      //Choose line Width
+      lineWidthPicked = getValue('line-Width');
+      valueChangeListen('line-Width', function () {
+        lineWidthPicked = getValue('line-Width')
+      });
+
+      //SelectedFontFamily
+      SelectedFontFamily = getValue('draw-text-font-family');
+      valueChangeListen('draw-text-font-family', function () {
+        SelectedFontFamily = getValue('draw-text-font-family')
+      });
+
+      //SelectedFontSize
+      SelectedFontSize = getValue('draw-text-font-size');
+      valueChangeListen('draw-text-font-size', function () {
+        SelectedFontSize = getValue('draw-text-font-size')
+      });
+
+      // Activate the default tool.
+      if (tools[tool_default]) {
+        tool = new tools[tool_default]();
+        tool_select.value = tool_default;
+      }
+
+      function pic_tool_click(pick) {
+        if (tools[pick.alt]) {
+          tool = new tools[pick.alt]();
+        }
+      }
+
+      document.getElementById("pencil-button").addEventListener('click', function () {
+        pic_tool_click(this)
+      });
+
+      document.getElementById("rect-button").addEventListener('click', function () {
+        pic_tool_click(this)
+      });
+
+      document.getElementById("circle-button").addEventListener('click', function () {
+        pic_tool_click(this)
+      });
+
+      document.getElementById("ellipse-button").addEventListener('click', function () {
+        pic_tool_click(this)
+      });
+
+      document.getElementById("line-button").addEventListener('click', function () {
+        pic_tool_click(this)
+      });
+
+      document.getElementById("text-button").addEventListener('click', function () {
+        pic_tool_click(this)
+      });
+
+
+
+      //Draw Grids
+      /* function SketchGrid(gridSize) {
+         context.clearRect(0, 0, canvas.width, canvas.height);
+
+         var w = canvas.width;
+         var h = canvas.height;
+         var gridWidth, gridColor;
+
+
+         if (gridSize === "normal") {
+           gridWidth = 25;
+           gridColor = "#e7e8e8";
+         } else if (gridSize === "medium") {
+           gridWidth = 45;
+           gridColor = "#e7e8e8";
+         } else if (gridSize === "large") {
+           gridWidth = 65;
+           gridColor = "#e7e8e8";
+         } else if (gridSize === "nogrid") {
+           gridWidth = 25;
+           gridColor = "#fff"; //no grid
+         }
+
+         /**
+          * i is used for both x and y to draw
+          * a line every 5 pixels starting at
+          * .5 to offset the canvas edges
+         
+
+         context.beginPath(); //important draw new everytime
+
+         for (var i = .5; i < w || i < h; i += gridWidth) {
+           // draw horizontal lines
+           context.moveTo(i, 0);
+           context.lineTo(i, h);
+           // draw vertical lines
+           context.moveTo(0, i);
+           context.lineTo(w, i);
+         }
+         context.strokeStyle = gridColor;
+         //contexto.strokeStyle = 'hsla(0, 0%, 40%, .5)';
+         context.stroke();
+
+       }*/
+
+      /*var SelectedGrid = $("#draw-grid").val();
+    
+          SketchGrid(SelectedGrid)  //Calling drawing grid fn
+    
+          $("#draw-grid").change(function(){
+              var SelectedGrid = $("#draw-grid").val();
+              SketchGrid(SelectedGrid)  //Calling drawing grid fn
+          });*/
+
+
+      // limit the number of events per second
+      function throttle(callback, delay) {
+        var previousCall = new Date().getTime();
+        return function () {
+          var time = new Date().getTime();
+
+          if ((time - previousCall) >= delay) {
+            previousCall = time;
+            callback.apply(null, arguments);
+          }
+        };
+      }
+
+      // Attach the mouse and touch event listeners.
+      canvas.addEventListener('mousedown', mouse_ev, false);
+      canvas.addEventListener('mousemove', throttle(mouse_ev, 10), false);
+      canvas.addEventListener('mouseup', mouse_ev, false);
+      // Attach the touchdown, touchmove and touchup event listeners.
+      canvas.addEventListener('touchstart', touch_ev, false);
+      canvas.addEventListener('touchmove', throttle(touch_ev, 10), false);
+      canvas.addEventListener('touchend', touch_ev, false);
+    }
+
+    // The general-purpose event handler. This function just determines the mouse 
+    // position relative to the canvas element.
+    function mouse_ev(ev) {
+      var CanvPos = canvas.getBoundingClientRect(); //Global Fix cursor position bug
+      if (ev.clientX || ev.clientX === 0) { // Firefox
+        ev._x = ev.clientX - CanvPos.left;
+        ev._y = ev.clientY - CanvPos.top;
+      }
+
+      // Call the event handler of the tool.
+      var func = tool[ev.type];
+      if (func) {
+        func(ev);
+      }
+      //Hide textbox if not equals to text tool
+    }
+
+    function touch_ev(ev) {
+      //ev.preventDefault();
+      //console.log(ev)
+      if (ev.touches[0]) {
+        var typeEquiv;
+        var CanvPos = canvas.getBoundingClientRect(); //Global Fix cursor position bug
+        if (ev.touches[0].clientX || ev.touches[0].clientX === 0) { // Firefox
+          ev._x = ev.touches[0].clientX - CanvPos.left;
+          ev._y = ev.touches[0].clientY - CanvPos.top;
+          console.log(ev._x, ev._y);
+          switch(ev.type){
+            case 'touchstart':
+              typeEquiv = 'mousedown';
+              break;
+            case 'touchmove':
+              typeEquiv = 'mousemove';
+              break;
+            case 'touchend':
+              typeEquiv = 'mouseup';
+              break;
+            default:
+              typeEquiv = 'mousedown';
+          }
+          console.log(typeEquiv);
+          // Call the event handler of the tool.
+          var func = tool[typeEquiv];
+          if (func) {
+            func(ev);
+          }
         }
         //Hide textbox if not equals to text tool
-
-
       }
+    }
 
-      // The event handler for any changes made to the tool selector.
-      /*function ev_tool_change(ev) {
-        if (tools[this.value]) {
-          tool = new tools[this.value]();
-        }
-      }*/
 
 
       // This function draws the #imageTemp canvas on top of #imageView, after which 
@@ -264,9 +293,9 @@ export const canvas  = (socket) => {
         context.moveTo(x0, y0);
         context.lineTo(x1, y1);
         if (color)
-          context.strokeStyle =  color;
+          context.strokeStyle = color;
         else
-          context.strokeStyle =  colorPicked;
+          context.strokeStyle = colorPicked;
         if (linewidth)
           context.lineWidth = linewidth;
         else
@@ -308,10 +337,11 @@ export const canvas  = (socket) => {
         // This is called when you start holding down the mouse button.
         // This starts the pencil drawing.
         this.mousedown = function (ev) {
+          console.log(ev._x, ev._y);
           //context.beginPath();
           //context.moveTo(ev._x, ev._y);
           tool.started = true;
-          tool.x0 = ev._x;
+          tool.x0 = ev.clientX;
           tool.y0 = ev._y;
         };
 
@@ -320,6 +350,36 @@ export const canvas  = (socket) => {
         // the mouse button).
         this.mousemove = function (ev) {
           if (tool.started) {
+            drawPencil(tool.x0, tool.y0, ev.clientX, ev._y, colorPicked, lineWidthPicked, true);
+            tool.x0 = ev.clientX;
+            tool.y0 = ev._y;
+          }
+        };
+
+        // This is called when you release the mouse button.
+        this.mouseup = function (ev) {
+          if (tool.started) {
+            tool.mousemove(ev);
+            tool.started = false;
+            img_update(true);
+          }
+        };
+
+        this.touchstart = function (ev) {
+          //context.beginPath();
+          //context.moveTo(ev.clientX, ev._y);
+          console.log('touch');
+          console.log(ev.clientX);
+          tool.started = true;
+          tool.x0 = ev._x;
+          tool.y0 = ev._y;
+        };
+
+        // This function is called every time you move the mouse. Obviously, it only 
+        // draws if the tool.started state is set to true (when you are holding down 
+        // the mouse button).
+        this.touchmove = function (ev) {
+          if (tool.started) {
             drawPencil(tool.x0, tool.y0, ev._x, ev._y, colorPicked, lineWidthPicked, true);
             tool.x0 = ev._x;
             tool.y0 = ev._y;
@@ -327,7 +387,7 @@ export const canvas  = (socket) => {
         };
 
         // This is called when you release the mouse button.
-        this.mouseup = function (ev) {
+        this.touchend = function (ev) {
           if (tool.started) {
             tool.mousemove(ev);
             tool.started = false;
@@ -341,9 +401,9 @@ export const canvas  = (socket) => {
 
         context.clearRect(0, 0, canvas.width, canvas.height);
         if (color)
-          context.strokeStyle =  color;
+          context.strokeStyle = color;
         else
-          context.strokeStyle =  colorPicked;
+          context.strokeStyle = colorPicked;
         if (linewidth)
           context.lineWidth = linewidth;
         else
@@ -427,9 +487,9 @@ export const canvas  = (socket) => {
         context.moveTo(x0, y0);
         context.lineTo(x1, y1);
         if (color)
-          context.strokeStyle =  color;
+          context.strokeStyle = color;
         else
-          context.strokeStyle =  colorPicked;
+          context.strokeStyle = colorPicked;
         if (linewidth)
           context.lineWidth = linewidth;
         else
@@ -496,7 +556,7 @@ export const canvas  = (socket) => {
 
       };
 
-      
+
 
       //New Circle Function
       function drawCircle(x1, y1, x2, y2, color, linewidth, emit) {
@@ -516,9 +576,9 @@ export const canvas  = (socket) => {
         // context.arc(x, y, 5, 0, Math.PI*2, false);
         context.closePath();
         if (color)
-          context.strokeStyle =  color;
+          context.strokeStyle = color;
         else
-          context.strokeStyle =  colorPicked;
+          context.strokeStyle = colorPicked;
         if (linewidth)
           context.lineWidth = linewidth;
         else
@@ -619,9 +679,9 @@ export const canvas  = (socket) => {
         context.closePath();
 
         if (color)
-          context.strokeStyle =  color;
+          context.strokeStyle = color;
         else
-          context.strokeStyle =  colorPicked;
+          context.strokeStyle = colorPicked;
         if (linewidth)
           context.lineWidth = linewidth;
         else
@@ -713,28 +773,28 @@ export const canvas  = (socket) => {
       textContainer.appendChild(tmp_txt_ctn);
 
 
-     /* var onDrawTextBox = function (ev_x, ev_y, tool_x0, tool_y0) {
+      /* var onDrawTextBox = function (ev_x, ev_y, tool_x0, tool_y0) {
 
-        //context.clearRect(0, 0, canvas.width, canvas.height); 
+         //context.clearRect(0, 0, canvas.width, canvas.height); 
 
-        var x = Math.min(ev_x, tool_x0);
-        var y = Math.min(ev_y, tool_y0);
-        var width = Math.abs(ev_x - tool_x0);
-        var height = Math.abs(ev_y - tool_y0);
+         var x = Math.min(ev_x, tool_x0);
+         var y = Math.min(ev_y, tool_y0);
+         var width = Math.abs(ev_x - tool_x0);
+         var height = Math.abs(ev_y - tool_y0);
 
-        textarea.style.left = x + 'px';
-        textarea.style.top = y + 'px';
-        textarea.style.width = width + 'px';
-        textarea.style.height = height + 'px';
+         textarea.style.left = x + 'px';
+         textarea.style.top = y + 'px';
+         textarea.style.width = width + 'px';
+         textarea.style.height = height + 'px';
 
-        textarea.style.display = 'block';
-      };*/
+         textarea.style.display = 'block';
+       };*/
 
 
       function DrawText(fsize, ffamily, colorVal, textPosLeft, textPosTop, processed_lines, emit) {
         context.font = fsize + ' ' + ffamily;
         context.textBaseline = 'top';
-        context.fillStyle =  colorVal;
+        context.fillStyle = colorVal;
 
         for (var n = 0; n < processed_lines.length; n++) {
           var processed_line = processed_lines[n];
@@ -780,6 +840,7 @@ export const canvas  = (socket) => {
         textarea.style.value = "";
 
         this.mousedown = function (ev) {
+          console.log('touch');
           tool.started = true;
           tool.x0 = ev._x;
           tool.y0 = ev._y;
@@ -802,7 +863,7 @@ export const canvas  = (socket) => {
           textarea.style.height = height + 'px';
 
           textarea.style.display = 'block';
-          textarea.style.color =  colorPicked;
+          textarea.style.color = colorPicked;
           textarea.style.font = SelectedFontSize + 'px' + ' ' + SelectedFontFamily;
         };
 
@@ -914,7 +975,7 @@ export const canvas  = (socket) => {
 
       socket.on('getRoomLines', lines => {
         console.log(lines);
-    });
+      });
 
 
 
@@ -923,7 +984,7 @@ export const canvas  = (socket) => {
 
 
 
-  //end
+      //end
 
 
-};
+    };

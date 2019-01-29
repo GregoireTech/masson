@@ -21,8 +21,6 @@ class Room extends Component {
 
     state = {
         loaded: false,
-        width: null,
-        height: null,
         roomName: 'greg',
         socket: null,
         guest: null,
@@ -50,8 +48,7 @@ class Room extends Component {
                     initiator: data.roomReady
                 });
                 socket.emit('getRoomLines');
-                console.log('getRoomLines');
-                });
+            });
             // Setup actions if join fails
             socket.on('joinFail', error => {
                 alert(error);
@@ -65,8 +62,8 @@ class Room extends Component {
             
         };
         // Setup width & height of the canvas
-        this.setCanvas();
-        //window.addEventListener('resize', this.setCanvas.bind(this));
+        //this.setCanvas();
+        window.addEventListener('resize', this.resizeCanvas.bind(this));
     };
     
     componentDidUpdate() {
@@ -86,16 +83,20 @@ class Room extends Component {
         };
     };
 
-    setCanvas(){
+    resizeCanvas(){
         const socket = this.state.socket;
         const canvasContainer = document.getElementById('container');
-        const canvasHeight = canvasContainer.offsetHeight;
-        const canvasWidth = canvasContainer.offsetWidth;
-        this.setState({
-            width: canvasWidth,
-            height: canvasHeight
-        });
-
+        const canvas1 = document.getElementById('imageView');
+        const canvas2 = document.getElementById('imageTemp');
+        if (canvasContainer && canvas){
+            canvas1.height = canvasContainer.offsetHeight;
+            canvas1.width = canvasContainer.offsetWidth;
+            canvas2.height = canvasContainer.offsetHeight;
+            canvas2.width = canvasContainer.offsetWidth;
+            if(socket){
+                socket.emit('getRoomLines');
+            }
+        }
     };
 
     sendInvite(){
@@ -127,11 +128,13 @@ class Room extends Component {
 
 
     render() {
-        let canvas;
-        if (this.state.loaded) {
-            canvas = <Canvas width={this.state.width} height={this.state.height} />
-        } else {
-            canvas = null;
+
+        let canvas = null;
+        const canvasContainer = document.getElementById('container');
+        if (canvasContainer){
+            const canvasHeight = canvasContainer.offsetHeight;
+            const canvasWidth = canvasContainer.offsetWidth;
+            canvas = <Canvas width={canvasWidth} height={canvasHeight} />
         }
         return (
             <div className='globalContainer'>

@@ -1,12 +1,16 @@
 import serversList from '../config/servers';
-const servers = [];
+const servers = serversList;
 
 const webRTC = (socket, initiator) => {
+
+    const localVideo = document.getElementById('localVideo');
+    let myStream;
+    let videoSetting = true;
+    let audioSetting = true;
 
     if (initiator) {
         console.log('starting initiator');
         let localConn = {};
-        const localVideo = document.getElementById('localVideo');
         const remoteVideo = document.getElementById('remoteVideo');
 
         function gotRemoteStream(e) {
@@ -20,6 +24,7 @@ const webRTC = (socket, initiator) => {
             audio: true,
             video: true
         }, function (localStream) {
+            myStream = localStream;
             localConn = new RTCPeerConnection(servers);
             localConn.addStream(localStream);
 
@@ -160,10 +165,10 @@ const webRTC = (socket, initiator) => {
             window.navigator.getUserMedia({
                 audio: true,
                 video: true
-            }, function (myStream) {
-
-                localVideo.srcObject = myStream;
-                localConn.addStream(myStream);
+            }, function (localStream) {
+                myStream = localStream;
+                localVideo.srcObject = localStream;
+                localConn.addStream(localStream);
 
                 // video = attachMediaStream(video, myStream);
                 // event to send local's iceCandaide to remote
@@ -202,11 +207,26 @@ const webRTC = (socket, initiator) => {
             remoteTempDesc = JSON.parse(remoteDesc);
             acceptOffer();
         });
-
-
-
     }
 
+    const camBtn = document.getElementById('camera');
+    const micBtn = document.getElementById('microphone');
+
+    camBtn.addEventListener('click', () => {
+        if(videoSetting = true){
+            videoSetting = false;
+            localVideo.pause();
+            localVideo.srcObject = null;
+            //myStream.active = false;
+            console.log(myStream);
+        } else {
+            console.log(myStream);
+            videoSetting = true;
+            localVideo.srcObject = myStream;
+            localVideo.play();
+        }
+
+    });
 
 
 };

@@ -1,0 +1,30 @@
+.header {
+    position: relative;
+    width: 70%;
+    background: white;
+    color: black;
+    margin: 0 auto;
+
+}
+
+.link {
+    color: #F05A5E;
+    font-family: 'Montserrat';
+    text-align: left;
+};
+
+
+.paragraph {
+    margin: 2rem 5rem;
+
+}
+
+
+.subtitle {
+    color: grey;
+}
+
+#logo {
+    width: 7rem;
+    height: 7rem;
+}

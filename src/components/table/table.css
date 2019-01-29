@@ -1,0 +1,13 @@
+.table {
+    background: rgb(238, 238, 238);
+    width: 100%;
+    padding: 2rem 0;
+}
+
+.roomName {
+    margin-bottom: 1rem;
+}
+
+.joinLink {
+    margin-left: 2rem;
+}
