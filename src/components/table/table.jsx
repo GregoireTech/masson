@@ -6,8 +6,9 @@ import './table.css';
 const table = (props) => {
     let tableItems;
         if (props.roomList !== []){
+            console.log(props.roomList);
             tableItems = props.roomList.map((room, index) => {
-                const itemText = `Tableau blanc créé le ${room.date} à ${room.time}`;
+                const itemText = `Tableau blanc créé le ${room.name} à ${room.time}`;
                 return (
                     <div className="tableItem" key={index} >
                         <p className='roomName'>{itemText}

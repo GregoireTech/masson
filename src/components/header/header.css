@@ -1,10 +1,21 @@
 .header {
     position: relative;
-    width: 70%;
+    width: 100%;
     background: white;
     color: black;
     margin: 0 auto;
+    padding: 3rem 0 1rem 0;
 
+}
+
+.headerContainer {
+    width: 70%;
+    margin: 0 auto;
+}
+
+.brand {
+    font-weight: 600;
+    margin-top: 0;
 }
 
 .link {
@@ -18,13 +29,19 @@
     margin: 2rem 5rem;
 
 }
-
+.title {
+    font-weight: 400;
+}
 
 .subtitle {
     color: grey;
 }
 
 #logo {
-    width: 7rem;
-    height: 7rem;
+    height: 15%;
+    width: 15%;
+    min-width: 7rem;
+    min-height: 7rem;
+    max-width: 10rem;
+    max-height: 10rem;;
 }

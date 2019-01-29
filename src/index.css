@@ -13,7 +13,7 @@ body {
   font-family: 'Montserrat', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: rgb(55,55,55);
+  background: rgb(131, 131, 131);
 }
 
 #root {

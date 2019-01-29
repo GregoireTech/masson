@@ -21,7 +21,7 @@ class Start extends Component {
     componentDidMount(){
         const params = queryString.parse(window.location.search);
         const io = require('socket.io-client');
-        const socket = io(`${endpoints.dev}`);
+        const socket = io(`${endpoints.prod}`);
         login(
             {
                 addRoom: this.addRoomToList.bind(this), 
