@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import queryString from 'query-string';
 import './Start.css';
-import login from '../../assets/JS/login';
+import login from '../../assets/scripts/login';
 import endpoints from '../../assets/config/endpoints.js';
 import Header from '../../components/header/header';
 import Table from '../../components/table/table';

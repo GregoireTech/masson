@@ -4,13 +4,16 @@
     background: white;
     color: black;
     margin: 0 auto;
-    padding: 3rem 0 1rem 0;
+    padding: 1rem;
+    text-align: left;
 
 }
 
 .headerContainer {
+    padding-top: 2rem;
     width: 70%;
     margin: 0 auto;
+    text-align: center;
 }
 
 .brand {
@@ -23,6 +26,7 @@
     font-family: 'Montserrat';
     text-align: left;
 };
+
 
 
 .paragraph {

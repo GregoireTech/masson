@@ -6,6 +6,7 @@ const header = (props) => {
 
     return (
         <div className='header' >
+        <a className='link' id='dashboardLink' href={props.dashboardUrl}>&#60; Revenir au tableau de bord</a>
         <div className='headerContainer'>
                 <img src={logoUrl} id='logo' alt='logo' />
                 <h1 className='brand'>COURS MASSON</h1>

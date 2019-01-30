@@ -4,10 +4,8 @@ import queryString from 'query-string';
 // Config
 import endpoints from '../../assets/config/endpoints.js';
 // Scripts
-import { canvas } from '../../assets/JS/canvas';
-import {initiator} from '../../assets/JS/initiator';
-import {receiver} from '../../assets/JS/receiver';
-import webRTC from '../../assets/JS/webRTC';
+import canvas from '../../assets/scripts/canvasNew';
+import webRTC from '../../assets/scripts/webRTC';
 // React components
 import Tools from '../../components/tools/tools';
 import Canvas from '../../components/canvas/canvas';

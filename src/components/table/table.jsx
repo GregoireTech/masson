@@ -5,7 +5,7 @@ import './table.css';
 
 const table = (props) => {
     let tableItems;
-        if (props.roomList !== []){
+        if (props.roomList !== [] && props.roomList.length >= 1){
             console.log(props.roomList);
             tableItems = props.roomList.map((room, index) => {
                 const itemText = `Tableau blanc créé le ${room.name} à ${room.time}`;
