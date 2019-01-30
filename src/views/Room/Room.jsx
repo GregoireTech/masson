@@ -4,22 +4,26 @@ import queryString from 'query-string';
 // Config
 import endpoints from '../../assets/config/endpoints.js';
 // Scripts
-import canvas from '../../assets/scripts/canvasNew';
-import webRTC from '../../assets/scripts/webRTC';
+//import canvas from '../../assets/scripts/canvasNew';
+//import webRTC from '../../assets/scripts/webRTC';
 // React components
 import Tools from '../../components/tools/tools';
-import Canvas from '../../components/canvas/canvas';
+//import Canvas from '../../components/canvas/canvas';
 import Controls from '../../components/controls/controls';
 import Invite from '../../components/modal/modal';
 import Backdrop from '../../components/backdrop/backdrop';
+// New
+import Board from '../../components/board/board';
+import boardScript from '../../assets/JS/board';
 // Stylesheet
 import './Room.css';
 
 class Room extends Component {
 
     state = {
-        loaded: false,
-        roomName: 'greg',
+        loaded: true,
+        boardId: null,
+        pin: null,
         socket: null,
         guest: null,
         modal: false,
@@ -29,23 +33,26 @@ class Room extends Component {
     componentDidMount() {
         // get URL Params
         const params = queryString.parse(window.location.search);
-        const roomName = params.id;
+        const boardId = params.id;
         const pin = params.pin;
         //Connect to room
         const io = require('socket.io-client');
-        const socket = io(`${endpoints.prod}rooms`);
-
+        const socket = io(`${endpoints.dev}boards`);
+        
         // Send join request
-        if (socket) {
+        if (socket && boardId) {
             // Setup actions if join succeeds OK
             socket.on('joinSuccess', (data) => {
                 console.log('joinSuccess');
                 this.setState({
+                    boardId: boardId,
+                    pin: pin,
                     loaded: true,
                     socket: socket,
-                    initiator: data.roomReady
+                    initiator: data.boardReady
                 });
-                socket.emit('getRoomLines');
+                //socket.emit('getRoomLines');
+                boardScript(socket, this.state.boardId);
             });
             // Setup actions if join fails
             socket.on('joinFail', error => {
@@ -55,47 +62,49 @@ class Room extends Component {
                 this.setState({visioStatus: data.status});
             })
             console.log('sending join request');
-            socket.emit('join', {room: roomName, pin: pin});
+            socket.emit('join', {id: boardId, pin: pin});
+            
             
             
         };
         // Setup width & height of the canvas
         //this.setCanvas();
-        window.addEventListener('resize', this.resizeCanvas.bind(this));
+        //window.addEventListener('resize', this.resizeCanvas.bind(this));
     };
     
     componentDidUpdate() {
-        console.log('component updated');
         if (this.state.loaded && this.state.socket) {
             const socket = this.state.socket;
-            canvas(socket);
             if(this.state.initiator !== null){
-                webRTC(socket, this.state.initiator);
+                //webRTC(socket, this.state.initiator);
             } 
-            socket.on('peerLeft', () => {
-                console.log('peer disconnected');
-                this.setState({initiator: false});
-                this.forceUpdate();
-                //window.location.reload();
-            });
+            socket.on('reconnect', () => {
+                socket.emit('joinboard', {room: this.state.boardId, pin: this.state.pin})
+            })
+            // socket.on('peerLeft', () => {
+            //     console.log('peer disconnected');
+            //     this.setState({initiator: false});
+            //     this.forceUpdate();
+            //     //window.location.reload();
+            // });
         };
     };
 
-    resizeCanvas(){
-        const socket = this.state.socket;
-        const canvasContainer = document.getElementById('container');
-        const canvas1 = document.getElementById('imageView');
-        const canvas2 = document.getElementById('imageTemp');
-        if (canvasContainer && canvas){
-            canvas1.height = canvasContainer.offsetHeight;
-            canvas1.width = canvasContainer.offsetWidth;
-            canvas2.height = canvasContainer.offsetHeight;
-            canvas2.width = canvasContainer.offsetWidth;
-            if(socket){
-                socket.emit('getRoomLines');
-            }
-        }
-    };
+    // resizeCanvas(){
+    //     const socket = this.state.socket;
+    //     const canvasContainer = document.getElementById('container');
+    //     const canvas1 = document.getElementById('imageView');
+    //     const canvas2 = document.getElementById('imageTemp');
+    //     if (canvasContainer && canvas){
+    //         canvas1.height = canvasContainer.offsetHeight;
+    //         canvas1.width = canvasContainer.offsetWidth;
+    //         canvas2.height = canvasContainer.offsetHeight;
+    //         canvas2.width = canvasContainer.offsetWidth;
+    //         if(socket){
+    //             socket.emit('getRoomLines');
+    //         }
+    //     }
+    // };
 
     sendInvite(){
         const guest = this.state.guest;
@@ -127,15 +136,15 @@ class Room extends Component {
 
     render() {
 
-        let canvas = null;
-        const canvasContainer = document.getElementById('container');
-        if (canvasContainer){
-            const canvasHeight = canvasContainer.offsetHeight;
-            const canvasWidth = canvasContainer.offsetWidth;
-            canvas = <Canvas width={canvasWidth} height={canvasHeight} />
+        let board = null;
+        const boardContainer = document.body;
+        if (boardContainer){
+            const boardHeight = boardContainer.offsetHeight;
+            const boardWidth = boardContainer.offsetWidth;
+            board = <Board width={boardWidth} height={boardHeight} />
         }
         return (
-            <div className='globalContainer'>
+            <div className='globalContainer' id='globalContainer'>
                 <Backdrop click={this.toggleModal.bind(this)} show={this.state.modal} />
                 <Invite 
                     show={this.state.modal}
@@ -147,7 +156,7 @@ class Room extends Component {
                 />
                 <Tools />
                 <div id="container">
-                    {canvas}
+                    {board}
                 </div>
                 <Controls 
                     teacher={this.teacher} 

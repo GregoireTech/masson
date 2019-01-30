@@ -1,0 +1,39 @@
+#board {
+	overflow: scroll;
+}
+#canvas {
+	overflow: scroll;
+}
+/* //////////////// TEXT ////////////////////*/
+#textToolInput {
+	position:fixed;
+	top:-1000px; /*Hidden*/
+	left:200px;
+	width:100%;
+}
+#textToolInput:focus {
+	top:0;
+}
+
+text {
+	font-family:"Arial", "Helvetica", sans-serif;
+	user-select:none;
+	-moz-user-select:none;
+}
+
+/* //////////////// RECTANGLE ////////////////////*/
+rect {
+	fill: none;
+}
+
+/* //////////////// PENCIL ////////////////////*/
+path {
+	fill: none;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+line {
+	fill: none;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}

@@ -13,35 +13,37 @@ class Start extends Component {
         socket: null,
         userData: {        
             firstName: 'Prénom',
-            lastName: 'Nom'
+            lastName: 'Nom',
+            uid: 'bferbaiho',
+            password: '333888'
         },
-        roomList: []
+        boardList: []
     }
 
     componentDidMount(){
         const params = queryString.parse(window.location.search);
         const io = require('socket.io-client');
-        const socket = io(`${endpoints.prod}`);
+        const socket = io(`${endpoints.dev}`);
         login(
             {
-                addRoom: this.addRoomToList.bind(this), 
+                addBoard: this.addBoardToList.bind(this), 
                 socket: socket
             }
         );
-        socket.emit('getRooms', this.state.userData)
+        socket.emit('getMyBoards', this.state.userData)
         this.setState({socket: socket});
     }
 
 
-    createRoom(){
+    createBoard(){
         if (this.state.socket){
             const socket = this.state.socket;
-            socket.emit('createRoom', this.state.userData);
+            socket.emit('createBoard', this.state.userData);
         }
     }
 
-    addRoomToList(newList){
-        this.setState({roomList: newList});
+    addBoardToList(newList){
+        this.setState({boardList: newList});
     }
 
 
@@ -49,8 +51,8 @@ class Start extends Component {
         
         return(
             <div className='startContainer'>
-                <Header create={this.createRoom.bind(this)} dashboardUrl='' />
-                <Table roomList={this.state.roomList} />
+                <Header create={this.createBoard.bind(this)} dashboardUrl='' />
+                <Table boardList={this.state.boardList} />
             </div>
         );
     };

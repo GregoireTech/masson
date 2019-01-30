@@ -5,6 +5,7 @@
     display: grid;
     grid-template-rows: 1;
     grid-template-columns: 1fr 14fr 2fr;
+    background: white;
 }
 
 .toolsContainer {

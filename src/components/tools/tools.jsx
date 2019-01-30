@@ -6,31 +6,31 @@ const tools = (props) => {
 
     const toolList = [
         {
-        id: 'pencil-button',
+        id: 'Pencil',
         name:'pencil'
     },
         {
-        id: 'rect-button',
+        id: 'Rectangle',
         name:'rect'
     },
+    //     {
+    //     id: 'circle-button',
+    //     name:'circle'
+    // },
+    //     {
+    //     id: 'ellipse-button',
+    //     name:'ellipse'
+    // },
         {
-        id: 'circle-button',
-        name:'circle'
-    },
-        {
-        id: 'ellipse-button',
-        name:'ellipse'
-    },
-        {
-        id: 'line-button',
+        id: 'Straight line',
         name:'line'
     },
         {
-        id: 'text-button',
+        id: 'Text',
         name:'text'
     },
         {
-        id: 'clear-all',
+        id: 'Eraser',
         name:'clear-all'
     }
     
@@ -50,13 +50,17 @@ const tools = (props) => {
             Colour :
             <br/>
             <input 
-                id='colour-picker'
+                id='chooseColor'
                 type='color'
                 defaultValue='#345678' 
             /> 
 
             </span>
-            <span className="form-group" >
+            <label htmlFor="chooseSize" data-translation="waiting">Size</label>
+          <input type="range" id="chooseSize" defaultValue="10" min="1" max="50" step="1" className="rangeChooser" />
+          <label htmlFor="chooseOpacity" data-translation="waiting">Opacity</label>
+          <input type="range" id="chooseOpacity" defaultValue="1" min="0.2" max="1" step="0.1" className="rangeChooser" />
+            {/* <span className="form-group" >
                 Thickness:
                 <br/>
                 <select className="form-control" id="line-Width">
@@ -99,8 +103,8 @@ const tools = (props) => {
                 <option value="38">38 Px</option>
                 <option value="40">40 Px</option>
                 </select>
-            </span>
-        </div>
+            </span> */}
+        </div> 
     );
 };
 

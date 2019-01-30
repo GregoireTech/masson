@@ -5,14 +5,15 @@ import './table.css';
 
 const table = (props) => {
     let tableItems;
-        if (props.roomList !== [] && props.roomList.length >= 1){
-            console.log(props.roomList);
-            tableItems = props.roomList.map((room, index) => {
-                const itemText = `Tableau blanc créé le ${room.name} à ${room.time}`;
+    console.log(props.boardList);
+        if (props.boardList !== [] && props.boardList.length >= 1){
+            
+            tableItems = props.boardList.map((board, index) => {
+                const itemText = `Tableau blanc créé le ${board.date} à ${board.time}`;
                 return (
                     <div className="tableItem" key={index} >
                         <p className='roomName'>{itemText}
-                            <Link to={`/rooms/?${room.string}`} >
+                            <Link to={`/boards/?${board.string}`} >
                                 <span className='link joinLink'>Rejoindre</span>
                             </Link>
                         </p>
