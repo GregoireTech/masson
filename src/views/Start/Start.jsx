@@ -12,9 +12,9 @@ class Start extends Component {
     state = {
         socket: null,
         userData: {        
-            firstName: 'Prénom',
-            lastName: 'Nom',
-            uid: 'bferbaiho',
+            firstName: 'Grégoire',
+            lastName: 'LeBeauGosse',
+            uid: 'gregocl',
             password: '333888'
         },
         boardList: []
@@ -22,8 +22,14 @@ class Start extends Component {
 
     componentDidMount(){
         const params = queryString.parse(window.location.search);
+        const userData = {
+            firstName: params.firstName, 
+            lastName: params.lastName,
+            uid: params.id,
+            password: params.password
+        }
         const io = require('socket.io-client');
-        const socket = io(`${endpoints.dev}`);
+        const socket = io(`${endpoints.prod}`);
         login(
             {
                 addBoard: this.addBoardToList.bind(this), 

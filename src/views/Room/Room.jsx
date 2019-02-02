@@ -4,17 +4,15 @@ import queryString from 'query-string';
 // Config
 import endpoints from '../../assets/config/endpoints.js';
 // Scripts
-//import canvas from '../../assets/scripts/canvasNew';
-//import webRTC from '../../assets/scripts/webRTC';
+import boardScript from '../../assets/scripts/board';
+import webRTC from '../../assets/scripts/webRTC';
 // React components
 import Tools from '../../components/tools/tools';
 //import Canvas from '../../components/canvas/canvas';
 import Controls from '../../components/controls/controls';
 import Invite from '../../components/modal/modal';
 import Backdrop from '../../components/backdrop/backdrop';
-// New
 import Board from '../../components/board/board';
-import boardScript from '../../assets/JS/board';
 // Stylesheet
 import './Room.css';
 
@@ -37,7 +35,7 @@ class Room extends Component {
         const pin = params.pin;
         //Connect to room
         const io = require('socket.io-client');
-        const socket = io(`${endpoints.dev}boards`);
+        const socket = io(`${endpoints.prod}boards`);
         
         // Send join request
         if (socket && boardId) {
@@ -137,11 +135,9 @@ class Room extends Component {
     render() {
 
         let board = null;
-        const boardContainer = document.body;
+        const boardContainer = document.getElementById('boardContainer');
         if (boardContainer){
-            const boardHeight = boardContainer.offsetHeight;
-            const boardWidth = boardContainer.offsetWidth;
-            board = <Board width={boardWidth} height={boardHeight} />
+            board = <Board width='1' height='1' />
         }
         return (
             <div className='globalContainer' id='globalContainer'>
@@ -155,7 +151,7 @@ class Room extends Component {
                     valid={this.state.validEmail}
                 />
                 <Tools />
-                <div id="container">
+                <div id="boardContainer">
                     {board}
                 </div>
                 <Controls 

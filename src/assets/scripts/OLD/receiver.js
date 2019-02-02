@@ -1,4 +1,4 @@
-import serversList from '../config/servers';
+import serversList from '../../config/servers';
 const servers = [];
 
 export const receiver = (socket) => {

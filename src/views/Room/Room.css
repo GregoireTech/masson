@@ -5,7 +5,7 @@
     display: grid;
     grid-template-rows: 1;
     grid-template-columns: 1fr 14fr 2fr;
-    background: white;
+    background: transparent;
 }
 
 .toolsContainer {
@@ -28,12 +28,13 @@
     padding: 10% 0.5rem;
 }
 
-#container {
+#boardContainer {
     grid-row-start: 1;
     grid-row-end: 2;
     grid-column-start: 2;
     grid-column-end: 3;
     position: relative;
-    background-color: #fff;
-    border-radius: 5px;
+    background-color: transparent;
+    position: relative;
+    overflow: hidden;
 }
