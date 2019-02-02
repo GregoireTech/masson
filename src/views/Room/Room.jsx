@@ -8,7 +8,6 @@ import boardScript from '../../assets/scripts/board';
 import webRTC from '../../assets/scripts/webRTC';
 // React components
 import Tools from '../../components/tools/tools';
-//import Canvas from '../../components/canvas/canvas';
 import Controls from '../../components/controls/controls';
 import Invite from '../../components/modal/modal';
 import Backdrop from '../../components/backdrop/backdrop';
@@ -62,12 +61,7 @@ class Room extends Component {
             console.log('sending join request');
             socket.emit('join', {id: boardId, pin: pin});
             
-            
-            
         };
-        // Setup width & height of the canvas
-        //this.setCanvas();
-        //window.addEventListener('resize', this.resizeCanvas.bind(this));
     };
     
     componentDidUpdate() {
@@ -88,21 +82,6 @@ class Room extends Component {
         };
     };
 
-    // resizeCanvas(){
-    //     const socket = this.state.socket;
-    //     const canvasContainer = document.getElementById('container');
-    //     const canvas1 = document.getElementById('imageView');
-    //     const canvas2 = document.getElementById('imageTemp');
-    //     if (canvasContainer && canvas){
-    //         canvas1.height = canvasContainer.offsetHeight;
-    //         canvas1.width = canvasContainer.offsetWidth;
-    //         canvas2.height = canvasContainer.offsetHeight;
-    //         canvas2.width = canvasContainer.offsetWidth;
-    //         if(socket){
-    //             socket.emit('getRoomLines');
-    //         }
-    //     }
-    // };
 
     sendInvite(){
         const guest = this.state.guest;

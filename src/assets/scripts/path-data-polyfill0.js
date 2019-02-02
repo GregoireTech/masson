@@ -491,8 +491,8 @@ const pathPolyfill = () => {
           var curves = [];
 
           for (var i = 0; i < params.length; i += 3) {
-            r1 = rotate(params[i][0], params[i][1], angleRad);
-            r2 = rotate(params[i + 1][0], params[i + 1][1], angleRad);
+            var r1 = rotate(params[i][0], params[i][1], angleRad);
+            var r2 = rotate(params[i + 1][0], params[i + 1][1], angleRad);
             var r3 = rotate(params[i + 2][0], params[i + 2][1], angleRad);
             curves.push([r1.x, r1.y, r2.x, r2.y, r3.x, r3.y]);
           }
@@ -539,8 +539,8 @@ const pathPolyfill = () => {
             currentX = x;
             currentY = y;
           } else if (type === "m") {
-            x = currentX + seg.values[0];
-            y = currentY + seg.values[1];
+            var x = currentX + seg.values[0];
+            var y = currentY + seg.values[1];
 
             absolutizedPathData.push({
               type: "M",
@@ -553,8 +553,8 @@ const pathPolyfill = () => {
             currentX = x;
             currentY = y;
           } else if (type === "L") {
-            x = seg.values[0];
-            y = seg.values[1];
+            var x = seg.values[0];
+            var y = seg.values[1];
 
             absolutizedPathData.push({
               type: "L",
@@ -564,8 +564,8 @@ const pathPolyfill = () => {
             currentX = x;
             currentY = y;
           } else if (type === "l") {
-            x = currentX + seg.values[0];
-            y = currentY + seg.values[1];
+            var x = currentX + seg.values[0];
+            var y = currentY + seg.values[1];
 
             absolutizedPathData.push({
               type: "L",
@@ -579,8 +579,8 @@ const pathPolyfill = () => {
             var y1 = seg.values[1];
             var x2 = seg.values[2];
             var y2 = seg.values[3];
-            x = seg.values[4];
-            y = seg.values[5];
+            var x = seg.values[4];
+            var y = seg.values[5];
 
             absolutizedPathData.push({
               type: "C",
@@ -590,12 +590,12 @@ const pathPolyfill = () => {
             currentX = x;
             currentY = y;
           } else if (type === "c") {
-            x1 = currentX + seg.values[0];
-            y1 = currentY + seg.values[1];
-            x2 = currentX + seg.values[2];
-            y2 = currentY + seg.values[3];
-            x = currentX + seg.values[4];
-            y = currentY + seg.values[5];
+            var x1 = currentX + seg.values[0];
+            var y1 = currentY + seg.values[1];
+            var x2 = currentX + seg.values[2];
+            var y2 = currentY + seg.values[3];
+            var x = currentX + seg.values[4];
+            var y = currentY + seg.values[5];
 
             absolutizedPathData.push({
               type: "C",
@@ -605,10 +605,10 @@ const pathPolyfill = () => {
             currentX = x;
             currentY = y;
           } else if (type === "Q") {
-            x1 = seg.values[0];
-            y1 = seg.values[1];
-            x = seg.values[2];
-            y = seg.values[3];
+            var x1 = seg.values[0];
+            var y1 = seg.values[1];
+            var x = seg.values[2];
+            var y = seg.values[3];
 
             absolutizedPathData.push({
               type: "Q",
@@ -618,10 +618,10 @@ const pathPolyfill = () => {
             currentX = x;
             currentY = y;
           } else if (type === "q") {
-            x1 = currentX + seg.values[0];
-            y1 = currentY + seg.values[1];
-            x = currentX + seg.values[2];
-            y = currentY + seg.values[3];
+            var x1 = currentX + seg.values[0];
+            var y1 = currentY + seg.values[1];
+            var x = currentX + seg.values[2];
+            var y = currentY + seg.values[3];
 
             absolutizedPathData.push({
               type: "Q",
@@ -631,8 +631,8 @@ const pathPolyfill = () => {
             currentX = x;
             currentY = y;
           } else if (type === "A") {
-            x = seg.values[5];
-            y = seg.values[6];
+            var x = seg.values[5];
+            var y = seg.values[6];
 
             absolutizedPathData.push({
               type: "A",
@@ -642,8 +642,8 @@ const pathPolyfill = () => {
             currentX = x;
             currentY = y;
           } else if (type === "a") {
-            x = currentX + seg.values[5];
-            y = currentY + seg.values[6];
+            var x = currentX + seg.values[5];
+            var y = currentY + seg.values[6];
 
             absolutizedPathData.push({
               type: "A",
@@ -653,38 +653,38 @@ const pathPolyfill = () => {
             currentX = x;
             currentY = y;
           } else if (type === "H") {
-            x = seg.values[0];
+            var x = seg.values[0];
             absolutizedPathData.push({
               type: "H",
               values: [x]
             });
             currentX = x;
           } else if (type === "h") {
-            x = currentX + seg.values[0];
+            var x = currentX + seg.values[0];
             absolutizedPathData.push({
               type: "H",
               values: [x]
             });
             currentX = x;
           } else if (type === "V") {
-            y = seg.values[0];
+            var y = seg.values[0];
             absolutizedPathData.push({
               type: "V",
               values: [y]
             });
             currentY = y;
           } else if (type === "v") {
-            y = currentY + seg.values[0];
+            var y = currentY + seg.values[0];
             absolutizedPathData.push({
               type: "V",
               values: [y]
             });
             currentY = y;
           } else if (type === "S") {
-            x2 = seg.values[0];
-            y2 = seg.values[1];
-            x = seg.values[2];
-            y = seg.values[3];
+            var x2 = seg.values[0];
+            var y2 = seg.values[1];
+            var x = seg.values[2];
+            var y = seg.values[3];
 
             absolutizedPathData.push({
               type: "S",
@@ -694,10 +694,10 @@ const pathPolyfill = () => {
             currentX = x;
             currentY = y;
           } else if (type === "s") {
-            x2 = currentX + seg.values[0];
-            y2 = currentY + seg.values[1];
-            x = currentX + seg.values[2];
-            y = currentY + seg.values[3];
+            var x2 = currentX + seg.values[0];
+            var y2 = currentY + seg.values[1];
+            var x = currentX + seg.values[2];
+            var y = currentY + seg.values[3];
 
             absolutizedPathData.push({
               type: "S",
@@ -707,8 +707,8 @@ const pathPolyfill = () => {
             currentX = x;
             currentY = y;
           } else if (type === "T") {
-            x = seg.values[0];
-            y = seg.values[1]
+            var x = seg.values[0];
+            var y = seg.values[1]
 
             absolutizedPathData.push({
               type: "T",
@@ -718,8 +718,8 @@ const pathPolyfill = () => {
             currentX = x;
             currentY = y;
           } else if (type === "t") {
-            x = currentX + seg.values[0];
-            y = currentY + seg.values[1]
+            var x = currentX + seg.values[0];
+            var y = currentY + seg.values[1]
 
             absolutizedPathData.push({
               type: "T",
@@ -778,8 +778,8 @@ const pathPolyfill = () => {
             var y1 = seg.values[1];
             var x2 = seg.values[2];
             var y2 = seg.values[3];
-            x = seg.values[4];
-            y = seg.values[5];
+            var x = seg.values[4];
+            var y = seg.values[5];
 
             reducedPathData.push({
               type: "C",
@@ -792,8 +792,8 @@ const pathPolyfill = () => {
             currentX = x;
             currentY = y;
           } else if (seg.type === "L") {
-            x = seg.values[0];
-            y = seg.values[1];
+            var x = seg.values[0];
+            var y = seg.values[1];
 
             reducedPathData.push({
               type: "L",
@@ -803,7 +803,7 @@ const pathPolyfill = () => {
             currentX = x;
             currentY = y;
           } else if (seg.type === "H") {
-            x = seg.values[0];
+            var x = seg.values[0];
 
             reducedPathData.push({
               type: "L",
@@ -812,7 +812,7 @@ const pathPolyfill = () => {
 
             currentX = x;
           } else if (seg.type === "V") {
-            y = seg.values[0];
+            var y = seg.values[0];
 
             reducedPathData.push({
               type: "L",
@@ -821,10 +821,10 @@ const pathPolyfill = () => {
 
             currentY = y;
           } else if (seg.type === "S") {
-            x2 = seg.values[0];
-            y2 = seg.values[1];
-            x = seg.values[2];
-            y = seg.values[3];
+            var x2 = seg.values[0];
+            var y2 = seg.values[1];
+            var x = seg.values[2];
+            var y = seg.values[3];
 
             var cx1, cy1;
 
@@ -847,10 +847,10 @@ const pathPolyfill = () => {
             currentX = x;
             currentY = y;
           } else if (seg.type === "T") {
-            x = seg.values[0];
-            y = seg.values[1];
+            var x = seg.values[0];
+            var y = seg.values[1];
 
-            
+            var x1, y1;
 
             if (lastType === "Q" || lastType === "T") {
               x1 = currentX + (currentX - lastControlX);
@@ -860,8 +860,8 @@ const pathPolyfill = () => {
               y1 = currentY;
             }
 
-            cx1 = currentX + 2 * (x1 - currentX) / 3;
-            cy1 = currentY + 2 * (y1 - currentY) / 3;
+            var cx1 = currentX + 2 * (x1 - currentX) / 3;
+            var cy1 = currentY + 2 * (y1 - currentY) / 3;
             var cx2 = x + 2 * (x1 - x) / 3;
             var cy2 = y + 2 * (y1 - y) / 3;
 
@@ -876,15 +876,15 @@ const pathPolyfill = () => {
             currentX = x;
             currentY = y;
           } else if (seg.type === "Q") {
-            x1 = seg.values[0];
-            y1 = seg.values[1];
-            x = seg.values[2];
-            y = seg.values[3];
+            var x1 = seg.values[0];
+            var y1 = seg.values[1];
+            var x = seg.values[2];
+            var y = seg.values[3];
 
-            cx1 = currentX + 2 * (x1 - currentX) / 3;
-            cy1 = currentY + 2 * (y1 - currentY) / 3;
-            cx2 = x + 2 * (x1 - x) / 3;
-            cy2 = y + 2 * (y1 - y) / 3;
+            var cx1 = currentX + 2 * (x1 - currentX) / 3;
+            var cy1 = currentY + 2 * (y1 - currentY) / 3;
+            var cx2 = x + 2 * (x1 - x) / 3;
+            var cy2 = y + 2 * (y1 - y) / 3;
 
             reducedPathData.push({
               type: "C",
@@ -902,8 +902,8 @@ const pathPolyfill = () => {
             var angle = seg.values[2];
             var largeArcFlag = seg.values[3];
             var sweepFlag = seg.values[4];
-            x = seg.values[5];
-            y = seg.values[6];
+            var x = seg.values[5];
+            var y = seg.values[6];
 
             if (r1 === 0 || r2 === 0) {
               reducedPathData.push({
@@ -981,7 +981,7 @@ const pathPolyfill = () => {
           if (this[$cachedPathData]) {
             return clonePathData(this[$cachedPathData]);
           } else {
-            pathData = parsePathDataString(this.getAttribute("d") || "");
+            var pathData = parsePathDataString(this.getAttribute("d") || "");
             this[$cachedPathData] = clonePathData(pathData);
             return pathData;
           }
