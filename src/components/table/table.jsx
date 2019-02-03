@@ -5,7 +5,6 @@ import './table.css';
 
 const table = (props) => {
     let tableItems;
-    console.log(props.boardList);
         if (props.boardList !== [] && props.boardList.length >= 1){
             
             tableItems = props.boardList.map((board, index) => {

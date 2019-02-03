@@ -1,232 +1,163 @@
+import adapter from 'webrtc-adapter';
 import serversList from '../config/servers';
 const servers = serversList;
 
-const webRTC = (socket, initiator) => {
 
+const webRTC = (socket, boardReady) => {
+    // Setup video containers
     const localVideo = document.getElementById('localVideo');
-    let myStream;
-    let videoSetting = true;
-    let audioSetting = true;
+    const remoteVideo = document.getElementById('remoteVideo');
+    // Setup local variables
+    let initiator = boardReady
+    let localMediaStream = false;
+    let localConn = {};
+    let remoteTempIceCandidates = [];
 
-    if (initiator) {
-        console.log('starting initiator');
-        let localConn = {};
-        const remoteVideo = document.getElementById('remoteVideo');
 
-        function gotRemoteStream(e) {
-            if (remoteVideo.srcObject !== e.streams[0]) {
-                remoteVideo.srcObject = e.streams[0];
-                console.log('initiator got remote stream');
-            }
-        };
 
+    // Try to get local stream 
+    const tryVideoChat = () => {
+        console.log('trying video');
         window.navigator.getUserMedia({
             audio: true,
             video: true
         }, function (localStream) {
-            myStream = localStream;
-            localConn = new RTCPeerConnection(servers);
-            localConn.addStream(localStream);
-
+            localMediaStream = localStream;
             localVideo.srcObject = localStream;
-            // display remote's screensharing
+            initVideoChat();
+        }, function (err) {
+            console.error("You are not allow navigator use device", err);
+        });
+    }
+
+    const initVideoChat = () => {
+        //Setup RTC connnection, add local stream and listen for remote stream
+        const setupConnection = () => {
+            console.log('setting up connection');
+            localConn = new RTCPeerConnection(servers);
+            localConn.addStream(localMediaStream);
             localConn.addEventListener('track', gotRemoteStream);
+            localConn.onicecandidate = handleLocalIceCandidate;
+        };
 
-            localConn.onicecandidate = function (evt) {
-                if (evt.candidate) {
-
-                    var lightCandidate = {
-                        sdpMid: evt.candidate.sdpMid,
-                        sdpMLineIndex: evt.candidate.sdpMLineIndex,
-                        candidate: evt.candidate.candidate
-                    }
-
-                    // send ice local's iceCandidate to remote
-                    console.log('sent ice candidate')
-                    socket.emit('CANDIDATE_WEB_RTC_INIT', {
-                        "candidate": lightCandidate
-                    });
-                }
-            };
-
+        // Starts connection, create & send offer
+        const handleVideoInit = () => {
+            console.log('peer ready');
             localConn.createOffer(function (desc) {
                 // desc is typeof RTCSessionDescription wich contains local's session
                 localConn.setLocalDescription(desc);
-
                 // send desc to remote
                 console.log('send desc');
-                socket.emit('ASK_WEB_RTC', JSON.stringify(desc));
-
+                socket.emit('OFFER_WEB_RTC', JSON.stringify(desc));
             }, function (err) {
                 console.error(err);
-            }, {
-                offerToReceiveAudio: 1,
-                offerToReceiveVideo: 1
             });
-
-        }, function (e) {
-            console.error("You are not allow navigator use device", e);
-        });
-
-
-
-
-        socket.on('CANDIDATE_WEB_RTC_REC', function (candidate) {
-            // var candidate = JSON.parse(candidate);
-
-            console.log('got candidate');
-            localConn.addIceCandidate(new RTCIceCandidate(candidate.candidate),
-                function () {
-                    console.log('AddIceCandidate success!');
-                },
-                function (err) {
-                    console.error('Error AddIceCandidate');
-                    console.error(err);
-                }
-            );
-        });
-
-        socket.on('RESPONSE_WEB_RTC', function (remoteDesc) {
-            console.log('got response');
-            localConn.setRemoteDescription(new RTCSessionDescription(remoteDesc));
-
-        });
-
-
-
-    } else {
-        const remoteVideo = document.getElementById('remoteVideo');
-
-        let remoteTempDesc = {};
-        let remoteTempIceCandidates = [];
-
-        let localConn = {};
-
-
-        function gotDescription(localDesc) {
-            localConn.setLocalDescription(localDesc,
-                function () {
-                    // isAcceptedOffer = true;
-                    registerIceCandidate();
-                    // send desc to remote
-                    socket.emit('RESPONSE_WEB_RTC', localDesc);
-                },
-                function (err) {
-                    console.error(err);
-                });
         }
 
-
-        function registerIceCandidate() {
-            for (var i = 0; i < remoteTempIceCandidates.length; i++) {
-                localConn.addIceCandidate(
-                    new RTCIceCandidate(remoteTempIceCandidates[i]),
-                    function () {
-                        console.log('AddIceCandidate success!');
-                    },
-                    function (err) {
-                        console.error('Error AddIceCandidate');
-                        console.error(err);
+        // Add offer to local connection, create & send answer
+        const handleOffer = (remoteDesc) => {
+            console.log('handling offer');
+            let remoteTempDesc = JSON.parse(remoteDesc);
+            // add remote's description
+            localConn.setRemoteDescription(
+                    new RTCSessionDescription(remoteTempDesc)
+                )
+                .then(() => {
+                    localConn.createAnswer(function (localDesc){
+                        localConn.setLocalDescription(localDesc);
+                        registerRemoteIceCandidates();
+                        socket.emit('RESPONSE_WEB_RTC', localDesc);
+                    }, function (err) {
+                        console.log(err);
                     });
-            }
+                })
+                .catch(err => console.log(err));
         }
 
+        // When we receive remote stream, display it in remote video
+        const gotRemoteStream = evt => {
+            console.log('got remote stream');
+            if (remoteVideo.srcObject !== evt.streams[0]) {
+                remoteVideo.srcObject = evt.streams[0];
 
-        function sentIceCandidates(evt) {
+            }
+        };
+
+        // Sort ice candidate & send them to remote peer
+        const handleLocalIceCandidate = evt => {
+            console.log('handling local candidate');
             if (evt.candidate) {
                 var lightCandidate = {
                     sdpMid: evt.candidate.sdpMid,
                     sdpMLineIndex: evt.candidate.sdpMLineIndex,
                     candidate: evt.candidate.candidate
                 }
-                socket.emit('CANDIDATE_WEB_RTC_REC', {
+                // send ice local's iceCandidate to remote
+                console.log('send ice candidate')
+                socket.emit('CANDIDATE_WEB_RTC', {
                     "candidate": lightCandidate
                 });
             }
-        };
-
-        function gotRemoteStream(e) {
-            if (remoteVideo.srcObject !== e.streams[0]) {
-                remoteVideo.srcObject = e.streams[0];
-                console.log('receiver got remote stream');
-            }
-        };
-
-        function displayError(error) {
-            console.error(error);
         }
 
-
-
-        function acceptOffer() {
-            localConn = new RTCPeerConnection(servers);
-            const localVideo = document.getElementById('localVideo');
-
-            window.navigator.getUserMedia({
-                audio: true,
-                video: true
-            }, function (localStream) {
-                myStream = localStream;
-                localVideo.srcObject = localStream;
-                localConn.addStream(localStream);
-
-                // video = attachMediaStream(video, myStream);
-                // event to send local's iceCandaide to remote
-                localConn.onicecandidate = sentIceCandidates;
-
-                // display remote's video stream
-                localConn.addEventListener('track', gotRemoteStream);
-
-                // add remote's description
-                localConn.setRemoteDescription(
-                    new RTCSessionDescription(remoteTempDesc),
-                    function () {
-                        localConn.createAnswer(gotDescription, displayError);
-                    }, displayError);
-
-            }, displayError);
-        }
-
-        // document.getElementById('visioBtn').addEventListener('click', () => {
-        //     if (localConn) {
-        //         localConn.close();
-        //     }
-        //     localConn = {};
-        // });
-
-        ///////////////////////////////////////////////////////////////////////
-
-        socket.on('CANDIDATE_WEB_RTC_REC', function (candidate) {
-            console.log('got web candidate');
+        // Receives remote ICE candidate to remote candidates array
+        const handleRemoteIceCandidate = candidate => {
+            console.log('handling remote candidate');
             remoteTempIceCandidates.push(candidate.candidate);
-        });
+        }
+        // Add remote candidates to local connection
+        const registerRemoteIceCandidates = () => {
+            console.log('handling remote candidate');
+            for (var i = 0; i < remoteTempIceCandidates.length; i++) {
+                localConn.addIceCandidate(
+                        new RTCIceCandidate(remoteTempIceCandidates[i])
+                    )
+                    .then(() => {
+                        console.log('AddIceCandidate success!');
+                    })
+                    .catch(err => {
+                        console.error('Error AddIceCandidate');
+                        console.error(err);
+                    })
+            }
+        }
 
+        // First we setup our own connection
+        setupConnection();
+        //Signal the other peer that we are ready
+        if (initiator) setTimeout(socket.emit('RTC_PEER_READY'), 5000);
+        // Setup the list of events we expect to receive
+        socket.on('RTC_PEER_READY', handleVideoInit);
 
-        socket.on('ASK_WEB_RTC', function (remoteDesc) {
-            console.log('ask_web_rtc');
-            remoteTempDesc = JSON.parse(remoteDesc);
-            acceptOffer();
+        socket.on('CANDIDATE_WEB_RTC', handleRemoteIceCandidate);
+
+        socket.on('OFFER_WEB_RTC', handleOffer);
+
+        socket.on('RESPONSE_WEB_RTC', remoteDesc => {
+            console.log('got response');
+            localConn.setRemoteDescription(new RTCSessionDescription(remoteDesc));
         });
     }
 
-    const camBtn = document.getElementById('camera');
-    const micBtn = document.getElementById('microphone');
-
-    camBtn.addEventListener('click', () => {
-        if(videoSetting = true){
-            videoSetting = false;
-            localVideo.pause();
-            localVideo.srcObject = null;
-            //myStream.active = false;
-            console.log(myStream);
+    // Re-initialize if peer disconnects
+    socket.on('PEER_DISCONNECTED', () => {
+        console.log("peer disconnected");
+        initiator = false;
+        if (localConn !== {}) localConn.close();
+        localConn = {};
+        remoteTempIceCandidates = [];
+        if (localMediaStream !== false) {
+            initVideoChat();
         } else {
-            console.log(myStream);
-            videoSetting = true;
-            localVideo.srcObject = myStream;
-            localVideo.play();
+            tryVideoChat();
         }
-
+        
     });
+
+    // First we setup our own connection & video stream
+    tryVideoChat();
+
+
 
 
 };

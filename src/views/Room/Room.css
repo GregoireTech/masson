@@ -1,9 +1,8 @@
 .globalContainer {
     width: 100vw;
     height: 100vh;
-    padding: 0.5rem;
     display: grid;
-    grid-template-rows: 1;
+    /* grid-template-rows: 1; */
     grid-template-columns: 1fr 14fr 2fr;
     background: transparent;
 }

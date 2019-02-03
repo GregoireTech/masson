@@ -34,7 +34,7 @@ class Room extends Component {
         const pin = params.pin;
         //Connect to room
         const io = require('socket.io-client');
-        const socket = io(`${endpoints.prod}boards`);
+        const socket = io(`${endpoints.dev}boards`);
         
         // Send join request
         if (socket && boardId) {
@@ -45,40 +45,26 @@ class Room extends Component {
                     boardId: boardId,
                     pin: pin,
                     loaded: true,
-                    socket: socket,
-                    initiator: data.boardReady
+                    socket: socket
                 });
-                //socket.emit('getRoomLines');
                 boardScript(socket, this.state.boardId);
+                webRTC(socket, data.boardReady);
             });
             // Setup actions if join fails
             socket.on('joinFail', error => {
                 alert(error);
             });
-            socket.on('setVisioStatus', data => {
-                this.setState({visioStatus: data.status});
-            })
             console.log('sending join request');
             socket.emit('join', {id: boardId, pin: pin});
-            
         };
     };
     
     componentDidUpdate() {
         if (this.state.loaded && this.state.socket) {
             const socket = this.state.socket;
-            if(this.state.initiator !== null){
-                //webRTC(socket, this.state.initiator);
-            } 
             socket.on('reconnect', () => {
                 socket.emit('joinboard', {room: this.state.boardId, pin: this.state.pin})
-            })
-            // socket.on('peerLeft', () => {
-            //     console.log('peer disconnected');
-            //     this.setState({initiator: false});
-            //     this.forceUpdate();
-            //     //window.location.reload();
-            // });
+            });
         };
     };
 
