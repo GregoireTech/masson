@@ -1,5 +1,5 @@
 import adapter from 'webrtc-adapter';
-import serversList from '../config/servers';
+import serversList from '../../config/servers';
 const servers = serversList;
 
 

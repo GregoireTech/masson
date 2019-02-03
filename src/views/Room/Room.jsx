@@ -4,7 +4,7 @@ import queryString from 'query-string';
 // Config
 import endpoints from '../../assets/config/endpoints.js';
 // Scripts
-import boardScript from '../../assets/scripts/board';
+import boardScript from '../../assets/scripts/board/board';
 import webRTC from '../../assets/scripts/webRTC';
 // React components
 import Tools from '../../components/tools/tools';
@@ -34,7 +34,7 @@ class Room extends Component {
         const pin = params.pin;
         //Connect to room
         const io = require('socket.io-client');
-        const socket = io(`${endpoints.dev}boards`);
+        const socket = io(`${endpoints.prod}boards`);
         
         // Send join request
         if (socket && boardId) {

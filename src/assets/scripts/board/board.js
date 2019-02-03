@@ -4,9 +4,9 @@ import toolScript from './toolsScript';
 const board = (socket, boardId) => {
 
 	// Define the canvas real size
-	const MAX_WIDTH = 1040;
-	const MAX_HEIGHT = 812;
-
+	
+	const MAX_HEIGHT = 3000;
+	const MAX_WIDTH = 1.6*MAX_HEIGHT;
 
 	pathPolyfill();
 	var Tools = {};
@@ -64,7 +64,7 @@ const board = (socket, boardId) => {
 
 	Tools.change = function (toolName) {
 		if (!(toolName in Tools.list)) {
-			throw "Trying to select a tool that has never been added!";
+			console.log("Trying to select a tool that has never been added!");
 		}
 
 		var newtool = Tools.list[toolName];
@@ -86,8 +86,8 @@ const board = (socket, boardId) => {
 		}
 
 		//Add the new event listeners
-		for (var event in newtool.compiledListeners) {
-			var listener = newtool.compiledListeners[event];
+		for (event in newtool.compiledListeners) {
+			listener = newtool.compiledListeners[event];
 			Tools.board.addEventListener(event, listener, {
 				'passive': false
 			});

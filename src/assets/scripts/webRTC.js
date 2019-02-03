@@ -12,7 +12,9 @@ const webRTC = (socket, boardReady) => {
     let localMediaStream = false;
     let localConn = {};
     let remoteTempIceCandidates = [];
-
+    let gotRemoteDesc = false;
+    let gotStream = false;
+    let gotLocalDescription = false;
 
 
     // Try to get local stream 
@@ -45,7 +47,10 @@ const webRTC = (socket, boardReady) => {
             console.log('peer ready');
             localConn.createOffer(function (desc) {
                 // desc is typeof RTCSessionDescription wich contains local's session
-                localConn.setLocalDescription(desc);
+                if (!gotLocalDescription) {
+                    localConn.setLocalDescription(desc);
+                    gotLocalDescription = true;
+                }
                 // send desc to remote
                 console.log('send desc');
                 socket.emit('OFFER_WEB_RTC', JSON.stringify(desc));
@@ -56,31 +61,39 @@ const webRTC = (socket, boardReady) => {
 
         // Add offer to local connection, create & send answer
         const handleOffer = (remoteDesc) => {
-            console.log('handling offer');
-            let remoteTempDesc = JSON.parse(remoteDesc);
-            // add remote's description
-            localConn.setRemoteDescription(
-                    new RTCSessionDescription(remoteTempDesc)
-                )
-                .then(() => {
-                    localConn.createAnswer(function (localDesc){
-                        localConn.setLocalDescription(localDesc);
-                        registerRemoteIceCandidates();
-                        socket.emit('RESPONSE_WEB_RTC', localDesc);
-                    }, function (err) {
-                        console.log(err);
-                    });
-                })
-                .catch(err => console.log(err));
+            if (!gotRemoteDesc) {
+                console.log('handling offer');
+                let remoteTempDesc = JSON.parse(remoteDesc);
+                // add remote's description
+                localConn.setRemoteDescription(
+                        new RTCSessionDescription(remoteTempDesc)
+                    )
+                    .then(() => {
+                        localConn.createAnswer(function (localDesc) {
+                            if (!gotLocalDescription) {
+                                localConn.setLocalDescription(localDesc);
+                                gotLocalDescription = true;
+                            }
+                            registerRemoteIceCandidates();
+                            socket.emit('RESPONSE_WEB_RTC', localDesc);
+                            gotRemoteDesc = true;
+                        }, function (err) {
+                            console.log(err);
+                        });
+                    })
+                    .catch(err => console.log(err));
+            }
         }
 
         // When we receive remote stream, display it in remote video
         const gotRemoteStream = evt => {
             console.log('got remote stream');
-            if (remoteVideo.srcObject !== evt.streams[0]) {
-                remoteVideo.srcObject = evt.streams[0];
+            //if (!gotStream) {
+                if (remoteVideo.srcObject !== evt.streams[0]) {
+                    remoteVideo.srcObject = evt.streams[0];
 
-            }
+                }
+            //}
         };
 
         // Sort ice candidate & send them to remote peer
@@ -135,14 +148,20 @@ const webRTC = (socket, boardReady) => {
 
         socket.on('RESPONSE_WEB_RTC', remoteDesc => {
             console.log('got response');
+            if(!gotRemoteDesc){
             localConn.setRemoteDescription(new RTCSessionDescription(remoteDesc));
-        });
+            gotRemoteDesc = true
+        }
+    });
     }
 
     // Re-initialize if peer disconnects
     socket.on('PEER_DISCONNECTED', () => {
         console.log("peer disconnected");
         initiator = false;
+        gotRemoteDesc = false;
+        gotStream = false;
+        gotLocalDescription = false;
         if (localConn !== {}) localConn.close();
         localConn = {};
         remoteTempIceCandidates = [];
@@ -151,7 +170,7 @@ const webRTC = (socket, boardReady) => {
         } else {
             tryVideoChat();
         }
-        
+
     });
 
     // First we setup our own connection & video stream
