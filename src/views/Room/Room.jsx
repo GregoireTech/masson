@@ -34,7 +34,7 @@ class Room extends Component {
         const pin = params.pin;
         //Connect to room
         const io = require('socket.io-client');
-        const socket = io(`${endpoints.prod}boards`);
+        const socket = io(`${endpoints.dev}boards`);
         
         // Send join request
         if (socket && boardId) {
@@ -48,7 +48,7 @@ class Room extends Component {
                     socket: socket
                 });
                 boardScript(socket, this.state.boardId);
-                webRTC(socket, data.boardReady);
+                webRTC(socket, data.boardReady, data.iceServers);
             });
             // Setup actions if join fails
             socket.on('joinFail', error => {
