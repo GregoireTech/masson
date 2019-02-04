@@ -32,8 +32,7 @@ const board = (socket, boardId) => {
 
 	Tools.add = function (newTool) {
 		if (newTool.name in Tools.list) {
-			console.log("Tools.add: The tool '" + newTool.name + "' is already" +
-				"in the list. Updating it...");
+			//console.log("Tools.add: The tool '" + newTool.name + "' is already" +	"in the list. Updating it...");
 		}
 
 		//Add event listener for the tool's icon
@@ -53,7 +52,7 @@ const board = (socket, boardId) => {
 		//There may be pending messages for the tool
 		var pending = Tools.pendingMessages[newTool.name];
 		if (pending) {
-			console.log("Drawing pending messages for '%s'.", newTool.name);
+			//console.log("Drawing pending messages for '%s'.", newTool.name);
 			var msg;
 			while (msg = pending.shift()) {
 				//Transmit the message to the tool (precising that it comes from the network)
@@ -64,7 +63,7 @@ const board = (socket, boardId) => {
 
 	Tools.change = function (toolName) {
 		if (!(toolName in Tools.list)) {
-			console.log("Trying to select a tool that has never been added!");
+			//console.log("Trying to select a tool that has never been added!");
 		}
 
 		var newtool = Tools.list[toolName];
@@ -301,7 +300,7 @@ const board = (socket, boardId) => {
 
 	// Set scale depending on screen size
 	const setCanvasScale = () => {
-		console.log('set canvas scale');
+		//console.log('set canvas scale');
 		let scaleToSet;
 		const sizeRatio = MAX_HEIGHT / MAX_WIDTH;
 		// Get screen size

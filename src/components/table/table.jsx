@@ -4,10 +4,28 @@ import {Link} from 'react-router-dom';
 import './table.css';
 
 const table = (props) => {
+    let list = props.boardList;
+    // Setup criterias for sorting the boards in chronological order
+    function compare (a, b){
+        if (a.date > b.date){
+            return -1;
+        } else if (a.date < b.date){
+            return 1;
+        } else if(a.date === b.date){
+            if (a.time >= b.time){
+                return -1;
+            } else {
+                return 1;
+            }
+        }
+    }
+    // Sort boards according to criterias above
+    list.sort(compare);
+
     let tableItems;
-        if (props.boardList !== [] && props.boardList.length >= 1){
+        if (list !== [] && list.length >= 1){
             
-            tableItems = props.boardList.map((board, index) => {
+            tableItems = list.map((board, index) => {
                 const itemText = `Tableau blanc créé le ${board.date} à ${board.time}`;
                 return (
                     <div className="tableItem" key={index} >
