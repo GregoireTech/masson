@@ -44,3 +44,21 @@
     margin: 0.5rem auto;
     border: solid 1px white;
 }
+
+.controlsContainer #fileInput {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+
+.controlsContainer #fileLabel {
+    margin: 0;
+    padding: 0;
+}
+
+.controlsContainer #download {
+    cursor: pointer;
+}

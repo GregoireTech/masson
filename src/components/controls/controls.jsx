@@ -41,6 +41,16 @@ const controls = (props) => {
                     <span className='toolText'>{control.name}</span>
                 </li>
             );        
+        } else if (control.link ==='download'){
+            return(
+                <li key={control.link} className='control' id={control.link} >
+                    <input type='file' id='fileInput'/>
+                    <label htmlFor='fileInput' className='fileLabel'>
+                        <img src={imgUrl} alt={control.link}/>
+                        <span className='toolText'>{control.name}</span>
+                    </label>
+                </li>
+            );  
         } else {
             return(
                 <li key={control.link} className='control' id={control.link} >

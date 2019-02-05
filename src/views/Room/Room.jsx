@@ -6,6 +6,7 @@ import endpoints from '../../assets/config/endpoints.js';
 // Scripts
 import boardScript from '../../assets/scripts/board/board';
 import webRTC from '../../assets/scripts/webRTC';
+import fileShare from '../../assets/scripts/fileShare';
 // React components
 import Tools from '../../components/tools/tools';
 import Controls from '../../components/controls/controls';
@@ -24,7 +25,9 @@ class Room extends Component {
         socket: null,
         guest: null,
         modal: false,
-        initiator: null
+        initiator: null,
+        file: null,
+        fileLoaded: 0
     }
     
     componentDidMount() {
@@ -49,6 +52,7 @@ class Room extends Component {
                 });
                 boardScript(socket, this.state.boardId);
                 webRTC(socket, data.boardReady, data.iceServers);
+                fileShare(socket);
             });
             // Setup actions if join fails
             socket.on('joinFail', error => {
@@ -95,8 +99,22 @@ class Room extends Component {
             modal: !previous
         });
     }
+/*
+    handleSelectedFile(){
+    const fileInput = document.getElementById('fileInput');
+        this.setState({
+            files: fileInput.target.files,
+            fileLoaded: 0
+        });
+    }
 
-
+    handleUpload(){
+        if (this.state.socket && this.state.files){
+            const socket = this.state.socket;
+            const files = this.state.files
+        }
+    }   
+*/
     render() {
 
         let board = null;
@@ -123,6 +141,7 @@ class Room extends Component {
                     teacher={this.teacher} 
                     student={this.student} 
                     openModal={this.toggleModal.bind(this)}
+                    // handleSelectedFile={this.handleSelectedFile.bind(this)}
                 />
             </div>
         );
