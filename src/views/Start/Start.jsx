@@ -5,6 +5,8 @@ import login from '../../assets/scripts/login';
 import endpoints from '../../assets/config/endpoints.js';
 import Header from '../../components/header/header';
 import Table from '../../components/table/table';
+// Import helpers functions
+import checkNavigator from '../../helpers/checkNavigator';
 
 
 
@@ -28,16 +30,20 @@ class Start extends Component {
             uid: params.id,
             password: params.password
         }
-        const io = require('socket.io-client');
-        const socket = io(`${endpoints.dev}`);
-        login(
-            {
-                addBoard: this.addBoardToList.bind(this), 
-                socket: socket
-            }
-        );
-        socket.emit('getMyBoards', this.state.userData)
-        this.setState({socket: socket});
+        if (checkNavigator()){
+            const io = require('socket.io-client');
+            const socket = io(`${endpoints.dev}`);
+            login(
+                {
+                    addBoard: this.addBoardToList.bind(this), 
+                    socket: socket
+                }
+            );
+            socket.emit('getMyBoards', this.state.userData)
+            this.setState({socket: socket});
+        } else {
+            alert("Votre navigateur n'est pas compatible avec cette apllication. Merci d'utiliser Chrome ou Safari." )
+        }
     }
 
 

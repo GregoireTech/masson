@@ -14,6 +14,8 @@ import Invite from '../../components/modal/modal';
 import Backdrop from '../../components/backdrop/backdrop';
 import Board from '../../components/board/board';
 import FileBox from '../../components/fileBox/fileBox';
+// Helpers functions
+import checkNavigator from '../../helpers/checkNavigator';
 // Stylesheet
 import './Room.css';
 
@@ -35,34 +37,39 @@ class Room extends Component {
         const params = queryString.parse(window.location.search);
         const boardId = params.id;
         const pin = params.pin;
-        //Connect to room
-        const io = require('socket.io-client');
-        const socket = io(`${endpoints.dev}boards`);
-        
-        // Send join request
-        if (socket && boardId) {
-            // Setup actions if join succeeds OK
-            socket.on('joinSuccess', (data) => {
-                console.log('joinSuccess');
-                this.setState({
-                    boardId: boardId,
-                    pin: pin,
-                    loaded: true,
-                    socket: socket
-                });
-                boardScript(socket, this.state.boardId);
-                webRTC(socket, data.boardReady, data.iceServers);
-                fileShare(socket, this.onDownloadComplete.bind(this));
-                
-            });
-            socket.on('joinFail', error => {
-                alert(error);
-            });
-            // Setup actions if join fails
+        // Verify that the navigator is compatible
+        if(checkNavigator()){
+            //Connect to room
+            const io = require('socket.io-client');
+            const socket = io(`${endpoints.dev}boards`);
             
-            console.log('sending join request');
-            socket.emit('join', {id: boardId, pin: pin});
-        };
+            // Send join request
+            if (socket && boardId) {
+                // Setup actions if join succeeds OK
+                socket.on('joinSuccess', (data) => {
+                    console.log('joinSuccess');
+                    this.setState({
+                        boardId: boardId,
+                        pin: pin,
+                        loaded: true,
+                        socket: socket
+                    });
+                    boardScript(socket, this.state.boardId);
+                    webRTC(socket, data.boardReady, data.iceServers);
+                    fileShare(socket, this.onDownloadComplete.bind(this));
+                    
+                });
+                socket.on('joinFail', error => {
+                    alert(error);
+                });
+                // Setup actions if join fails
+                
+                console.log('sending join request');
+                socket.emit('join', {id: boardId, pin: pin});
+            };
+        } else {
+            alert("Votre navigateur n'est pas compatible avec cette apllication. Merci d'utiliser Chrome ou Safari." )
+        }
     };
     
     componentDidUpdate() {
