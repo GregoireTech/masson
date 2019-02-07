@@ -1,0 +1,54 @@
+#fileBox {
+    position: fixed;
+    bottom: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.6rem;
+    color: white;
+    background: #F05A5E;
+    margin: 0 1rem;
+    border-radius: 5px;
+    width: 15rem;
+    text-align: center;
+}
+.fileIcon {
+    width:1rem;
+    height: 1rem;
+    vertical-align: -webkit-baseline-middle;
+    vertical-align: middle;
+
+}
+
+.fileContent {
+    font-size: 0.9rem;
+    vertical-align: -webkit-baseline-middle;
+    vertical-align: middle;
+}
+
+#fileBtnContainer{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10%;
+}
+
+.fileBtn {
+    display: inline-block;
+    margin: 0.2rem;
+    padding: 0.5rem;
+    border: solid 1px white;
+    cursor: pointer;
+    font-size: 0.8rem;
+    border-radius: 5px;
+}
+
+#fileOK {
+    background: white;
+    color: #F05A5E;
+    font-weight: bold;
+}
+
+#fileNOK{
+    
+    color: white;
+}

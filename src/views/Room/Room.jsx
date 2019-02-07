@@ -13,6 +13,7 @@ import Controls from '../../components/controls/controls';
 import Invite from '../../components/modal/modal';
 import Backdrop from '../../components/backdrop/backdrop';
 import Board from '../../components/board/board';
+import FileBox from '../../components/fileBox/fileBox';
 // Stylesheet
 import './Room.css';
 
@@ -26,8 +27,7 @@ class Room extends Component {
         guest: null,
         modal: false,
         initiator: null,
-        file: null,
-        fileLoaded: 0
+        receivedFile: null
     }
     
     componentDidMount() {
@@ -52,12 +52,14 @@ class Room extends Component {
                 });
                 boardScript(socket, this.state.boardId);
                 webRTC(socket, data.boardReady, data.iceServers);
-                fileShare(socket);
+                fileShare(socket, this.onDownloadComplete.bind(this));
+                
             });
-            // Setup actions if join fails
             socket.on('joinFail', error => {
                 alert(error);
             });
+            // Setup actions if join fails
+            
             console.log('sending join request');
             socket.emit('join', {id: boardId, pin: pin});
         };
@@ -68,6 +70,19 @@ class Room extends Component {
             const socket = this.state.socket;
             socket.on('reconnect', () => {
                 socket.emit('joinboard', {room: this.state.boardId, pin: this.state.pin})
+            });
+            socket.on('fileTransferRequest', data => {
+                //console.log('fileTransferRequest');
+                const fileData = JSON.parse(data);
+                const file = {
+                    name: fileData.name,
+                    size: fileData.size,
+                    downloading: false
+                };
+                this.setState({receivedFile: file});
+            });
+            socket.on('message', (data) => {
+                alert(data.msg);
             });
         };
     };
@@ -99,28 +114,47 @@ class Room extends Component {
             modal: !previous
         });
     }
-/*
-    handleSelectedFile(){
-    const fileInput = document.getElementById('fileInput');
-        this.setState({
-            files: fileInput.target.files,
-            fileLoaded: 0
-        });
+
+    onFileAccepted(){
+        //console.log(e.target);
+        const socket = this.state.socket;
+        socket.emit('fileTransferAccepted');
+        const file = this.state.receivedFile;
+        file.downloading = true;
     }
 
-    handleUpload(){
-        if (this.state.socket && this.state.files){
-            const socket = this.state.socket;
-            const files = this.state.files
-        }
-    }   
-*/
-    render() {
+    onFileRefused(){
+        const socket = this.state.socket;
+        this.setState({receivedFile: null});
+        socket.emit('message', {msg: 'Votre interlocuteur a refusé le fichier'});
+    }
 
+    onDownloadComplete(){
+        const socket = this.state.socket;
+        this.setState({receivedFile: null});
+        socket.emit('message', {msg: 'Votre interlocuteur a bien reçu le fichier'});
+    }
+
+
+
+    render() {
         let board = null;
         const boardContainer = document.getElementById('boardContainer');
         if (boardContainer){
             board = <Board width='1' height='1' />
+        }
+        let fileItem = null;
+        if(this.state.receivedFile !== null){
+            const file = this.state.receivedFile;
+            fileItem = (
+                <FileBox
+                name={file.name}
+                size={file.size}
+                downloading={file.downloading}
+                onAccept={this.onFileAccepted.bind(this)}
+                onRefuse={this.onFileRefused.bind(this)}
+                />
+            );
         }
         return (
             <div className='globalContainer' id='globalContainer'>
@@ -141,8 +175,8 @@ class Room extends Component {
                     teacher={this.teacher} 
                     student={this.student} 
                     openModal={this.toggleModal.bind(this)}
-                    // handleSelectedFile={this.handleSelectedFile.bind(this)}
                 />
+                {fileItem}
             </div>
         );
     };

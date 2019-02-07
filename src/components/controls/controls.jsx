@@ -41,7 +41,7 @@ const controls = (props) => {
                     <span className='toolText'>{control.name}</span>
                 </li>
             );        
-        } else if (control.link ==='download'){
+        } else if (control.link ==='file'){
             return(
                 <li key={control.link} className='control' id={control.link} >
                     <input type='file' id='fileInput'/>

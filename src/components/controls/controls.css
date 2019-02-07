@@ -54,11 +54,8 @@
 	z-index: -1;
 }
 
-.controlsContainer #fileLabel {
+.controlsContainer label {
     margin: 0;
     padding: 0;
-}
-
-.controlsContainer #download {
     cursor: pointer;
 }
