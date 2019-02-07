@@ -44,7 +44,7 @@ const controls = (props) => {
         } else if (control.link ==='file'){
             return(
                 <li key={control.link} className='control' id={control.link} >
-                    <input type='file' id='fileInput'/>
+                    <input type='file' id='fileInput' />
                     <label htmlFor='fileInput' className='fileLabel'>
                         <img src={imgUrl} alt={control.link}/>
                         <span className='toolText'>{control.name}</span>

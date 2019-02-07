@@ -66,6 +66,20 @@ class Room extends Component {
                 
                 console.log('sending join request');
                 socket.emit('join', {id: boardId, pin: pin});
+                socket.on('fileTransferRequest', data => {
+                    //console.log('fileTransferRequest');
+                    const fileData = JSON.parse(data);
+                    const file = {
+                        name: fileData.name,
+                        size: fileData.size,
+                        downloading: false
+                    };
+                    this.setState({receivedFile: file});
+                });
+                socket.on('message', (data) => {
+                    console.log(data.msg);
+                    alert(data.msg);
+                });
             };
         } else {
             alert("Votre navigateur n'est pas compatible avec cette apllication. Merci d'utiliser Chrome ou Safari." )
@@ -78,19 +92,7 @@ class Room extends Component {
             socket.on('reconnect', () => {
                 socket.emit('joinboard', {room: this.state.boardId, pin: this.state.pin})
             });
-            socket.on('fileTransferRequest', data => {
-                //console.log('fileTransferRequest');
-                const fileData = JSON.parse(data);
-                const file = {
-                    name: fileData.name,
-                    size: fileData.size,
-                    downloading: false
-                };
-                this.setState({receivedFile: file});
-            });
-            socket.on('message', (data) => {
-                alert(data.msg);
-            });
+
         };
     };
 

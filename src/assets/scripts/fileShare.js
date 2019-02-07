@@ -7,6 +7,10 @@ const fileShare = (socket, onDownloadComplete) => {
     let currentChunk;
     const fileInput = document.getElementById('fileInput');
     const fileReader = new FileReader();
+    const acceptedTypes = [
+        'pdf', 'jpeg', 'jpg', 'svg', 'png', 'txt', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'
+    ];
+    const maxSize = 4000000; // Max size in bytes => 4 mb
 
 
     //////////////////////////////////////////////////////////
@@ -25,18 +29,45 @@ const fileShare = (socket, onDownloadComplete) => {
             readNextChunk();
         }
     };
+
+    //fn to validate file type and size
+    const validateFile = (file) => {
+        let valid;
+        const split = file.name.split('.');
+        const extension = split[split.length-1];
+        console.log(extension);
+        if (acceptedTypes.includes(extension)) {
+            if (file.size <= maxSize) {
+                valid = true;
+            } else {
+                valid = `Fichier trop volumineux. Taille maximale acceptée: ${maxSize/1000000}Mb`;
+            }
+        } else {
+            let acceptString = '';
+            for (let i = 0; i < acceptedTypes.length; i++) {
+                acceptString += ` .${acceptedTypes[i]}`
+            }
+            valid = `Type de fichier non accepté. Les types acceptés sont :${acceptString}.`
+        }
+        return valid;
+    }
+
     // On file input, we send info to the peer and await confirmation
     fileInput.addEventListener('change', function () {
         console.log(fileInput.files);
         file = fileInput.files[0];
-        currentChunk = 0;
-        // send some metadata about our file
-        // to the receiver
-        socket.emit('fileTransferRequest', JSON.stringify({
-            name: file.name,
-            size: file.size
-        }));
-        
+        const valid = validateFile(file);
+        if (valid === true) {
+            currentChunk = 0;
+            // send some metadata about our file
+            // to the receiver
+            socket.emit('fileTransferRequest', JSON.stringify({
+                name: file.name,
+                size: file.size
+            }));
+        } else {
+            alert(valid);
+        }
     });
     // On confirmation that the peer accepts the file, we start the transfer
     socket.on('fileTransferAccepted', () => {
@@ -97,7 +128,7 @@ const fileShare = (socket, onDownloadComplete) => {
         startDownload(data);
         console.log(data);
     });
-    
+
     socket.on('fileSendResult', function (data) {
         progressDownload(data);
         console.log(data);
@@ -107,31 +138,31 @@ const fileShare = (socket, onDownloadComplete) => {
 export default fileShare;
 
 
-  /*  const createFileElem = (data) => {
-        const filesContainer = document.getElementById('container');
-        const fileElem = (
-            <FileBox 
-                name={data.name} 
-                size={data.size} 
-                onAccept={onFileDownload}
-                downloading={downloadInProgress}
-                progress = {downloadProgress}
-            />
-        );
-        filesContainer.appendChild(fileElem);
-    }
+/*  const createFileElem = (data) => {
+      const filesContainer = document.getElementById('container');
+      const fileElem = (
+          <FileBox 
+              name={data.name} 
+              size={data.size} 
+              onAccept={onFileDownload}
+              downloading={downloadInProgress}
+              progress = {downloadProgress}
+          />
+      );
+      filesContainer.appendChild(fileElem);
+  }
 
-    // 
-    const createFilesContainer = data => {
-        const filesContainer = document.createElement('div');
-        filesContainer.id = 'filesContainer';
-        document.getElementById('boardContainer').appendChild(filesContainer);
-        createFileElem(data);
-    }
+  // 
+  const createFilesContainer = data => {
+      const filesContainer = document.createElement('div');
+      filesContainer.id = 'filesContainer';
+      document.getElementById('boardContainer').appendChild(filesContainer);
+      createFileElem(data);
+  }
 
-    // Once the user clicks on accept
-    const onFileDownload = (data) => {
-        socket.emit('fileTranferAccepted');
-        startDownload(data);
-        console.log(data);
-    } */
+  // Once the user clicks on accept
+  const onFileDownload = (data) => {
+      socket.emit('fileTranferAccepted');
+      startDownload(data);
+      console.log(data);
+  } */
