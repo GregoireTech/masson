@@ -1,7 +1,7 @@
 import pathPolyfill from './path-data-polyfill';
 import toolScript from './toolsScript';
 
-const board = (socket, boardId) => {
+const board = (socket, boardId, chosenColor) => {
 
 	// Define the canvas real size
 	
@@ -263,15 +263,13 @@ const board = (socket, boardId) => {
 	};
 
 	Tools.getColor = (function color() {
-		var chooser = document.getElementById("chooseColor");
+		var chooser = document.getElementById("colorDiv");
+		//console.log(chooser.style);
 		// Init with a random color
-		var clrs = ["#001f3f", "#0074D9", "#7FDBFF", "#39CCCC", "#3D9970",
-			"#2ECC40", "#01FF70", "#FFDC00", "#FF851B", "#FF4136",
-			"#85144b", "#F012BE", "#B10DC9", "#111111", "#AAAAAA"
-		];
-		chooser.value = clrs[Math.random() * clrs.length | 0];
+		var clrs = ['#B80000', '#DB3E00', '#FCCB00', '#008B02', '#006B76', '#1273DE', '#004DCF', '#5300EB', '#EB9694', '#FAD0C3', '#FEF3BD', '#C1E1C5', '#BEDADC', '#C4DEF6', '#BED3F3', '#D4C4FB'];
+		chooser.style.backgroundColor = clrs[Math.random() * clrs.length | 0];
 		return function () {
-			return chooser.value;
+			return chooser.style.backgroundColor;
 		};
 	})();
 

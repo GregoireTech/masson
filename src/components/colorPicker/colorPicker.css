@@ -1,0 +1,5 @@
+#colorPicker {
+    position: fixed;
+    overflow: visible;
+    z-index: 3000;
+}

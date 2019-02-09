@@ -1,78 +1,85 @@
-import React from 'react';
+import React, { Component } from 'react';
 
+import ColorPicker from '../colorPicker/colorPicker';
 import './tools.css';
 
-const tools = (props) => {
+class Tools extends Component {
 
-    const toolList = [
-        {
-        id: 'Pencil',
-        name:'pencil'
-    },
-        {
-        id: 'Rectangle',
-        name:'rect'
-    },
-    //     {
-    //     id: 'circle-button',
-    //     name:'circle'
-    // },
-    //     {
-    //     id: 'ellipse-button',
-    //     name:'ellipse'
-    // },
-        {
-        id: 'Straight line',
-        name:'line'
-    },
-        {
-        id: 'Text',
-        name:'text'
-    },
-        {
-        id: 'Eraser',
-        name:'erase'
+    state = {
+        activeTool: null,
+        chosenColor: '345678',
+        showPicker: false
     }
-    // ,
-    //     {
-    //     id: 'Zoom',
-    //     name:'zoom'
-    // }
-    // // ,
-    //     {
-    //     id: 'Hand',
-    //     name:'drag'
-    // }
+
+    setActiveTool(e){
+        if (this.state.activeTool !== null){
+            document.getElementById(this.state.activeTool).classList.remove('activeTool');
+        }
+        e.target.classList.add('activeTool');
+        this.setState({ activeTool: e.target.id });
+    }
     
-]
+    handleColorChange(color){
+        const colorDiv = document.getElementById('colorDiv');
+        const chosenColor = color.hex;
+        colorDiv.style.background = chosenColor;
+        this.setState({chosenColor: chosenColor, showPicker: false});
+    }
+    togglePicker(){
+        const showPicker = !this.state.showPicker;
+        this.setState({showPicker: showPicker});
+    }
 
-    let tools = toolList.map(tool => {
-        let toolUrl = require(`../../assets/icons/tools/${tool.name}.svg`); 
-        return (
-            <img key={tool.name} src={toolUrl} alt={tool.name} id={tool.id}/>
+    render (){
+        const pickerItem = (
+            <ColorPicker
+            color={this.state.chosenColor}
+            colorChange={this.handleColorChange.bind(this)}
+            />
         );
-    });
+        const toolList = [
+            {
+            id: 'Pencil',
+            name:'pencil'
+        },
+            {
+            id: 'Rectangle',
+            name:'rect'
+        },
+            {
+            id: 'Straight line',
+            name:'line'
+        },
+            {
+            id: 'Text',
+            name:'text'
+        },
+            {
+            id: 'Eraser',
+            name:'erase'
+        }
+        ]
+        let toolItems = toolList.map(tool => {
+            let toolUrl = require(`../../assets/icons/tools/${tool.name}.svg`); 
+            return (
+                <img key={tool.name} src={toolUrl} alt={tool.name} id={tool.id} onClick={this.setActiveTool.bind(this)}/>
+            );
+        });
 
-    return(
-        <div className="toolsContainer">
-            {tools}
-            <span className="form-group" >
-            Colour :
-            <br/>
-            <input 
-                id='chooseColor'
-                type='color'
-                defaultValue='#345678' 
-            /> 
+        return(
+            <div className="toolsContainer">
+                {toolItems}
+                <div id='colorDiv' onClick={this.togglePicker.bind(this)}>
+                </div>
+                {this.state.showPicker? pickerItem : null}
+                <label htmlFor="chooseSize" data-translation="waiting">Taille</label>
+                <input type="range" id="chooseSize" defaultValue="10" min="1" max="50" step="1" className="rangeChooser" />
+                <label htmlFor="chooseOpacity" data-translation="waiting">Opacité</label>
+                <input type="range" id="chooseOpacity" defaultValue="1" min="0.2" max="1" step="0.1" className="rangeChooser" />
 
-            </span>
-            <label htmlFor="chooseSize" data-translation="waiting">Size</label>
-            <input type="range" id="chooseSize" defaultValue="10" min="1" max="50" step="1" className="rangeChooser" />
-            <label htmlFor="chooseOpacity" data-translation="waiting">Opacity</label>
-            <input type="range" id="chooseOpacity" defaultValue="1" min="0.2" max="1" step="0.1" className="rangeChooser" />
-
-        </div> 
-    );
+            </div> 
+        );
+    }
 };
 
-export default tools;
+export default Tools;

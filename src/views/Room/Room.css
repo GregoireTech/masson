@@ -3,7 +3,7 @@
     height: 100vh;
     display: grid;
     /* grid-template-rows: 1; */
-    grid-template-columns: 1fr 14fr 2fr;
+    grid-template-columns: 1fr 12fr 2fr 2fr;
     background: transparent;
 }
 
@@ -19,19 +19,11 @@
     padding: 10% 0.5rem;
 }
 
-.controlsContainer {
-    grid-column-start: 3;
-    grid-column-end: 4;
-    grid-row-start: 1;
-    grid-row-end: 2;
-    padding: 10% 0.5rem;
-}
-
 #boardContainer {
     grid-row-start: 1;
     grid-row-end: 2;
     grid-column-start: 2;
-    grid-column-end: 3;
+    grid-column-end: 4;
     position: relative;
     background-color: transparent;
     position: relative;

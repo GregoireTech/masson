@@ -1,11 +1,18 @@
 .controlsContainer {
-    grid-column-start: 3;
-    grid-column-end: 4;
+    grid-column-end: 5;
     grid-row-start: 1;
     grid-row-end: 2;
-    background: rgb(55, 55, 55);
-    padding: 10% 0.5rem;
+    background: #212121;
     text-align: center;
+    padding: 10% 0;
+    position: relative;
+}
+
+.containerSmall {
+    grid-column-start: 4;
+}
+.containerBig {
+    grid-column-start: 3;
 }
 
 .controlsContainer ul {
@@ -27,8 +34,8 @@
 }
 
 .controlsContainer .control img {
-    width: 1.8rem;
-    height: 1.8rem;
+    width: 2.2rem;
+    height: 2.2rem;
     margin: 0.5rem auto;
     display: block;
 }
@@ -38,11 +45,25 @@
     color: white;
 }
 
+.videoContainer {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    display: block;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
 .controlsContainer video {
-    width: 95%;
-    height: 90px;
-    margin: 0.5rem auto;
-    border: solid 1px white;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    /* margin: 0.5rem auto; */
+}
+
+.controlsContainer video:hover {
+    cursor: pointer;
 }
 
 .controlsContainer #fileInput {

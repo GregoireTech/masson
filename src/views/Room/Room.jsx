@@ -14,6 +14,7 @@ import Invite from '../../components/modal/modal';
 import Backdrop from '../../components/backdrop/backdrop';
 import Board from '../../components/board/board';
 import FileBox from '../../components/fileBox/fileBox';
+import Help from '../../components/help/help';
 // Helpers functions
 import checkNavigator from '../../helpers/checkNavigator';
 // Stylesheet
@@ -29,7 +30,8 @@ class Room extends Component {
         guest: null,
         modal: false,
         initiator: null,
-        receivedFile: null
+        receivedFile: null,
+        help: false
     }
     
     componentDidMount() {
@@ -144,6 +146,10 @@ class Room extends Component {
         socket.emit('message', {msg: 'Votre interlocuteur a bien reçu le fichier'});
     }
 
+    toggleHelp(){
+        const newHelp = !this.state.help;
+        this.setState({help: newHelp});
+    }
 
 
     render() {
@@ -167,6 +173,7 @@ class Room extends Component {
         }
         return (
             <div className='globalContainer' id='globalContainer'>
+
                 <Backdrop click={this.toggleModal.bind(this)} show={this.state.modal} />
                 <Invite 
                     show={this.state.modal}
@@ -178,12 +185,17 @@ class Room extends Component {
                 />
                 <Tools />
                 <div id="boardContainer">
+                    <Help 
+                        show={this.state.help}
+                        close={this.toggleHelp.bind(this)}
+                    />
                     {board}
                 </div>
                 <Controls 
                     teacher={this.teacher} 
                     student={this.student} 
                     openModal={this.toggleModal.bind(this)}
+                    toggleHelp={this.toggleHelp.bind(this)}
                 />
                 {fileItem}
             </div>

@@ -1,0 +1,30 @@
+.help {
+    width: 100%;
+    position: relative;
+    background: white;
+}
+
+.show {
+    height: 100%;
+}
+
+.noShow {
+    height: 0;
+}
+
+.help embed {
+    width: 100%;
+    height: 90%;
+}
+
+.helpBtn {
+    position: absolute;
+    bottom: 2%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 1rem;
+    color: white;
+    background: #F05A5E;
+    border-radius: 5px;
+    cursor: pointer;
+}
