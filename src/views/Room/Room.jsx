@@ -15,8 +15,6 @@ import Backdrop from '../../components/backdrop/backdrop';
 import Board from '../../components/board/board';
 import FileBox from '../../components/fileBox/fileBox';
 import Help from '../../components/help/help';
-// Helpers functions
-import checkNavigator from '../../helpers/checkNavigator';
 // Stylesheet
 import './Room.css';
 
@@ -31,7 +29,9 @@ class Room extends Component {
         modal: false,
         initiator: null,
         receivedFile: null,
-        help: false
+        help: false,
+        audio: true,
+        video: true
     }
     
     componentDidMount() {
@@ -39,53 +39,49 @@ class Room extends Component {
         const params = queryString.parse(window.location.search);
         const boardId = params.id;
         const pin = params.pin;
-        // Verify that the navigator is compatible
-        if(checkNavigator()){
-            //Connect to room
-            const io = require('socket.io-client');
-            const socket = io(`${endpoints.dev}boards`);
-            
-            // Send join request
-            if (socket && boardId) {
-                // Setup actions if join succeeds OK
-                socket.on('joinSuccess', (data) => {
-                    console.log('joinSuccess');
-                    this.setState({
-                        boardId: boardId,
-                        pin: pin,
-                        loaded: true,
-                        socket: socket
-                    });
-                    boardScript(socket, this.state.boardId);
-                    webRTC(socket, data.boardReady, data.iceServers);
-                    fileShare(socket, this.onDownloadComplete.bind(this));
-                    
+        //Connect to room
+        const io = require('socket.io-client');
+        const socket = io(`${endpoints.prod}boards`);
+        
+        // Send join request
+        if (socket && boardId) {
+            // Setup actions if join succeeds OK
+            socket.on('joinSuccess', (data) => {
+                console.log('joinSuccess');
+                this.setState({
+                    boardId: boardId,
+                    pin: pin,
+                    loaded: true,
+                    socket: socket
                 });
-                socket.on('joinFail', error => {
-                    alert(error);
-                });
-                // Setup actions if join fails
+                boardScript(socket, this.state.boardId);
+                webRTC(socket, data.boardReady, data.iceServers, {audio: this.state.audio, video: this.state.video});
+                fileShare(socket, this.onDownloadComplete.bind(this));
                 
-                console.log('sending join request');
-                socket.emit('join', {id: boardId, pin: pin});
-                socket.on('fileTransferRequest', data => {
-                    //console.log('fileTransferRequest');
-                    const fileData = JSON.parse(data);
-                    const file = {
-                        name: fileData.name,
-                        size: fileData.size,
-                        downloading: false
-                    };
-                    this.setState({receivedFile: file});
-                });
-                socket.on('message', (data) => {
-                    console.log(data.msg);
-                    alert(data.msg);
-                });
-            };
-        } else {
-            alert("Votre navigateur n'est pas compatible avec cette apllication. Merci d'utiliser Chrome ou Safari." )
-        }
+            });
+            socket.on('joinFail', error => {
+                alert(error);
+            });
+            // Setup actions if join fails
+            
+            console.log('sending join request');
+            socket.emit('join', {id: boardId, pin: pin});
+            socket.on('fileTransferRequest', data => {
+                //console.log('fileTransferRequest');
+                const fileData = JSON.parse(data);
+                const file = {
+                    name: fileData.name,
+                    size: fileData.size,
+                    downloading: false
+                };
+                this.setState({receivedFile: file});
+            });
+            socket.on('message', (data) => {
+                console.log(data.msg);
+                alert(data.msg);
+            });
+        };
+
     };
     
     componentDidUpdate() {
@@ -151,6 +147,16 @@ class Room extends Component {
         this.setState({help: newHelp});
     }
 
+    onToggleAudio(){
+        const newOption = !this.state.audio;
+        this.setState({audio: newOption});
+    }
+
+    onToggleVideo(){
+        const newOption = !this.state.video;
+        this.setState({video: newOption});
+    }
+
 
     render() {
         let board = null;
@@ -196,6 +202,10 @@ class Room extends Component {
                     student={this.student} 
                     openModal={this.toggleModal.bind(this)}
                     toggleHelp={this.toggleHelp.bind(this)}
+                    audio={this.state.audio}
+                    video={this.state.video}
+                    toggleAudio={this.onToggleAudio.bind(this)}
+                    toggleVideo={this.onToggleVideo.bind(this)}
                 />
                 {fileItem}
             </div>

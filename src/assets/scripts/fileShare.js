@@ -58,6 +58,7 @@ const fileShare = (socket, onDownloadComplete) => {
         file = fileInput.files[0];
         const valid = validateFile(file);
         if (valid === true) {
+            alert('Fichier envoyé')
             currentChunk = 0;
             // send some metadata about our file
             // to the receiver
@@ -88,14 +89,12 @@ const fileShare = (socket, onDownloadComplete) => {
     let incomingFileInfo;
     let incomingFileData;
     let bytesReceived;
-    let downloadInProgress = false;
 
     function startDownload(data) {
         incomingFileInfo = JSON.parse(data.toString());
         console.log(incomingFileInfo);
         incomingFileData = [];
         bytesReceived = 0;
-        downloadInProgress = true;
         console.log('incoming file <b>' + incomingFileInfo.name + '</b> of ' + incomingFileInfo.size + ' bytes');
     }
 
@@ -109,9 +108,6 @@ const fileShare = (socket, onDownloadComplete) => {
     }
 
     function endDownload() {
-        downloadInProgress = false;
-        //const blob = new Blob(incomingFileData);
-
         var a = document.createElement("a");
         document.body.appendChild(a);
         a.style = "display: none";
@@ -137,32 +133,3 @@ const fileShare = (socket, onDownloadComplete) => {
 
 export default fileShare;
 
-
-/*  const createFileElem = (data) => {
-      const filesContainer = document.getElementById('container');
-      const fileElem = (
-          <FileBox 
-              name={data.name} 
-              size={data.size} 
-              onAccept={onFileDownload}
-              downloading={downloadInProgress}
-              progress = {downloadProgress}
-          />
-      );
-      filesContainer.appendChild(fileElem);
-  }
-
-  // 
-  const createFilesContainer = data => {
-      const filesContainer = document.createElement('div');
-      filesContainer.id = 'filesContainer';
-      document.getElementById('boardContainer').appendChild(filesContainer);
-      createFileElem(data);
-  }
-
-  // Once the user clicks on accept
-  const onFileDownload = (data) => {
-      socket.emit('fileTranferAccepted');
-      startDownload(data);
-      console.log(data);
-  } */

@@ -5,10 +5,6 @@ import login from '../../assets/scripts/login';
 import endpoints from '../../assets/config/endpoints.js';
 import Header from '../../components/header/header';
 import Table from '../../components/table/table';
-// Import helpers functions
-import checkNavigator from '../../helpers/checkNavigator';
-
-
 
 class Start extends Component {
     state = {
@@ -30,9 +26,8 @@ class Start extends Component {
             uid: params.id,
             password: params.password
         }
-        if (checkNavigator()){
             const io = require('socket.io-client');
-            const socket = io(`${endpoints.dev}`);
+            const socket = io(`${endpoints.prod}`);
             login(
                 {
                     addBoard: this.addBoardToList.bind(this), 
@@ -41,9 +36,6 @@ class Start extends Component {
             );
             socket.emit('getMyBoards', this.state.userData)
             this.setState({socket: socket});
-        } else {
-            alert("Votre navigateur n'est pas compatible avec cette apllication. Merci d'utiliser Chrome ou Safari." )
-        }
     }
 
 

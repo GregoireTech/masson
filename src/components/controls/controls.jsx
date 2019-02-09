@@ -8,11 +8,12 @@ const controls = (props) => {
     let remoteBig = false;
     let localBig = false;
     let containerBig = false;
-    let containerClasses = 'controlsContainer containerSmall';
-    let remoteClasses, localClasses;
-    
+    let gridStart, remoteGridStart, localGridStart;
+    const controlsContainer = document.getElementById('controlsContainer');
+    const localVideo = document.getElementById('localVideo');
+    const remoteVideo = document.getElementById('remoteVideo');
+    const controls = document.getElementsByClassName('control');
     const changeVideoSize = e => {
-        console.log(e.target.id);
         const id = e.target.id;
         if (id === 'localVideo'){
             localBig = !localBig;
@@ -24,10 +25,24 @@ const controls = (props) => {
         } else {
             containerBig = false;
         }
-        containerBig? containerClasses = 'controlsContainer containerBig' : containerClasses = 'controlsContainer containerSmall'  
-        remoteBig? remoteClasses = 'videoBig' : remoteClasses = 'videoSmall'  
-        localBig? localClasses = 'videoBig' : localClasses = 'videoSmall'  
-        console.log(containerBig, containerClasses);
+        containerBig? gridStart = 3 : gridStart = 4;
+        if(containerBig){
+            for (let i = 0; i < controls.length; i++) {
+                controls[i].style.display = 'inline-block'
+            };
+            remoteBig? remoteGridStart = 1 : remoteGridStart = 2; 
+            localBig? localGridStart = 1 : localGridStart = 2;  
+        } else {
+            for (let i = 0; i < controls.length; i++) {
+                controls[i].style.display = 'block'
+            };
+            remoteGridStart = 1;
+            localGridStart = 1;
+        }
+        controlsContainer.style.gridColumnStart = gridStart;
+        localVideo.style.gridColumnStart = localGridStart;
+        remoteVideo.style.gridColumnStart = remoteGridStart;
+
     }
 
     const controlsList1 = [
@@ -51,28 +66,18 @@ const controls = (props) => {
         }
     ];
     const controlsList2 = [
-        // { 
-        //     linkOn : 'micon',
-        //     linkOff : 'micoff',
-        //     name: 'Micro On',
-        //     state: true,
-        //     click: toggleItem
-        // },
-        // { 
-        //     linkOn : 'camon',
-        //     linkOff : 'camoff',
-        //     name: 'Vidéo On',
-        //     state: true,
-        //     click: toggleItem
-        // },
         { 
-            link : 'microphone',
-            name: 'Micro On'
+            link : 'mic',
+            name: 'Micro',
+            state: true,
+            click: props.toggleAudio
         },
         { 
-            link : 'camera',
-            name: 'Vidéo On'
-        }
+            link : 'cam',
+            name: 'Vidéo',
+            state: true,
+            click: props.toggleVideo
+        },
     ];
 
 
@@ -106,12 +111,29 @@ const controls = (props) => {
             }
         });
     }
+    const dispatchVideoControls = (list) => {
+        return list.map((control) => {
+            let setting;
+            if(control.link === 'cam'){ setting = props.video } 
+            else { setting = props.audio}
+            let state;
+            setting? state = 'On' : state = 'Off'
+            let imgUrl=require(`../../assets/icons/controls/${control.link}${state}.svg`);
+            const string = `${control.name} ${state}`
+                return(
+                    <li onClick={control.click} key={control.link} className='control' id={control.link} >
+                        <img src={imgUrl} alt={control.link}/>
+                        <span className='toolText'>{string}</span>
+                    </li>
+                );        
+        });
+    }
     let controlItems1 = dispatchControls(controlsList1);
-    let controlItems2 = dispatchControls(controlsList2);
+    let controlItems2 = dispatchVideoControls(controlsList2);
     
 
     return(
-        <div id="controlsContainer" className={containerClasses}>
+        <div id="controlsContainer">
             <ul className='controls'>
                 {controlItems1}
             </ul>
@@ -119,8 +141,8 @@ const controls = (props) => {
                 <ul className='controls'>
                     {controlItems2}
                 </ul>
-                <video autoPlay id="remoteVideo" onClick={changeVideoSize} className={remoteClasses} ></video>
-                <video autoPlay muted id="localVideo" onClick={changeVideoSize} className={localClasses} ></video>
+                <video autoPlay id="remoteVideo" onClick={changeVideoSize} ></video>
+                <video autoPlay muted id="localVideo" onClick={changeVideoSize} ></video>
             </div>
         </div>
     );

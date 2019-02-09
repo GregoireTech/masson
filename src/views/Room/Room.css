@@ -1,6 +1,7 @@
 .globalContainer {
     width: 100vw;
     height: 100vh;
+    display: -ms-grid;
     display: grid;
     /* grid-template-rows: 1; */
     grid-template-columns: 1fr 12fr 2fr 2fr;
