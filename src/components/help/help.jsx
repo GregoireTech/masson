@@ -6,7 +6,7 @@ const help = (props) => {
     props.show? helpClass = 'help show' : helpClass = 'help noShow';
     return(
         <div className={helpClass}>
-            <embed src='https//:www.google.com'/>
+            <embed href='https//:www.google.com'/>
             <div className='helpBtn' onClick={props.close} >Close</div>
         </div>
     );

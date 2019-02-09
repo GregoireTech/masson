@@ -1,14 +1,15 @@
 // This will throw a warning as not called explicitly in the script but is still required
 import adapter from 'webrtc-adapter';
 
-const webRTC = (socket, boardReady, servers, options) => {
-    console.log(servers.iceServers);
+let localMediaStream = false;
+
+export const setupWebRTC = (socket, servers, options) => {
     // Setup video containers
     const localVideo = document.getElementById('localVideo');
     const remoteVideo = document.getElementById('remoteVideo');
     // Setup local variables
-    let initiator = boardReady
-    let localMediaStream = false;
+    let started = false
+    
     let localConn = {};
     let gotRemoteDesc = false;
     let gotLocalDescription = false;
@@ -45,7 +46,7 @@ const webRTC = (socket, boardReady, servers, options) => {
 
     // Try to get local stream 
     const tryVideoChat = () => {
-        console.log('trying video');
+        //console.log('trying video');
         window.navigator.getUserMedia({
             audio: options.audio,
             video: options.video
@@ -54,41 +55,44 @@ const webRTC = (socket, boardReady, servers, options) => {
             localVideo.srcObject = localStream;
             initVideoChat();
         }, function (err) {
-            console.error("You are not allow navigator use device", err);
+            console.error("Votre navigateur n'autorise pas la connection vidéo.", err);
         });
     }
 
     const initVideoChat = () => {
         //Setup RTC connnection, add local stream and listen for remote stream
         const setupConnection = () => {
-            console.log('setting up connection');
-            localConn = new RTCPeerConnection(ICE_config2);
-            localConn.addStream(localMediaStream);
-            localConn.addEventListener('track', gotRemoteStream);
-            localConn.onicecandidate = handleLocalIceCandidate;
+            if (!started){
+                started = true;
+                //console.log('setting up connection');
+                localConn = new RTCPeerConnection(ICE_config2);
+                localConn.addStream(localMediaStream);
+                localConn.addEventListener('track', gotRemoteStream);
+                localConn.onicecandidate = handleLocalIceCandidate;
+            }
         };
 
         // Starts connection, create & send offer
         const handleVideoInit = () => {
-            console.log('peer ready');
-            localConn.createOffer(function (desc) {
-                // desc is typeof RTCSessionDescription wich contains local's session
-                if (!gotLocalDescription) {
-                    localConn.setLocalDescription(desc);
-                    gotLocalDescription = true;
-                    console.log('send desc');
-                    socket.emit('OFFER_WEB_RTC', JSON.stringify(desc));
-                }
-                // send desc to remote
-            }, function (err) {
-                console.error(err);
-            });
+            if (localConn !== {}){
+                localConn.createOffer(function (desc) {
+                    // desc is typeof RTCSessionDescription wich contains local's session
+                    if (!gotLocalDescription) {
+                        localConn.setLocalDescription(desc);
+                        gotLocalDescription = true;
+                        //console.log('send desc');
+                        socket.emit('OFFER_WEB_RTC', JSON.stringify(desc));
+                    }
+                    // send desc to remote
+                }, function (err) {
+                    console.error(err);
+                });
+            }
         }
-
         // Add offer to local connection, create & send answer
         const handleOffer = (remoteDesc) => {
-            if (!gotRemoteDesc) {
-                console.log('handling offer');
+            if (!gotRemoteDesc && localConn !== {}) {
+                //console.log('handling offer');
                 let remoteTempDesc = JSON.parse(remoteDesc);
                 // add remote's description
                 localConn.setRemoteDescription(
@@ -115,7 +119,7 @@ const webRTC = (socket, boardReady, servers, options) => {
 
         // When we receive remote stream, display it in remote video
         const gotRemoteStream = evt => {
-            console.log('got remote stream');
+            //console.log('got remote stream');
             if (remoteVideo.srcObject !== evt.streams[0]) {
                 remoteVideo.srcObject = evt.streams[0];
             }
@@ -123,11 +127,11 @@ const webRTC = (socket, boardReady, servers, options) => {
 
         // Sort ice candidate & send them to remote peer
         const handleLocalIceCandidate = evt => {
-            console.log('handling local candidate');
+            //console.log('handling local candidate');
             if (evt.candidate) {
 
                 // send ice local's iceCandidate to remote
-                console.log('send ice candidate')
+                //console.log('send ice candidate')
                 socket.emit('CANDIDATE_WEB_RTC', {
                     candidate: evt.candidate
                 });
@@ -136,14 +140,14 @@ const webRTC = (socket, boardReady, servers, options) => {
 
         // Receives remote ICE candidate to remote candidates array
         const handleRemoteIceCandidate = data => {
-            console.log('handling remote candidate');
-            if (data.candidate) {
+            //console.log('handling remote candidate');
+            if (data.candidate && localConn !== {}) {
                 //if (gotRemoteDesc) {
                 localConn.addIceCandidate(
                         new RTCIceCandidate(data.candidate)
                     )
                     .then(() => {
-                        console.log('AddIceCandidate success!');
+                        //console.log('AddIceCandidate success!');
                     })
                     .catch(err => {
                         console.error('Error AddIceCandidate');
@@ -151,54 +155,85 @@ const webRTC = (socket, boardReady, servers, options) => {
                     })
             }
         }
-
-        // First we setup our own connection
-        setupConnection();
-        //Signal the other peer that we are ready
-        if (initiator) setTimeout(socket.emit('RTC_PEER_READY'), 5000);
-        // Setup the list of events we expect to receive
-        socket.on('RTC_PEER_READY', handleVideoInit);
-
-        socket.on('CANDIDATE_WEB_RTC', handleRemoteIceCandidate);
-
-        socket.on('OFFER_WEB_RTC', handleOffer);
-
-        socket.on('RESPONSE_WEB_RTC', remoteDesc => {
-            console.log('got response');
-            if (!gotRemoteDesc) {
-                localConn.setRemoteDescription(new RTCSessionDescription(remoteDesc));
-                gotRemoteDesc = true;
-                //registerIceCandidates();
+        
+        const initSetup = () => {
+            if (localConn !== {}){
+                localConn.close();
+                localConn = {};
             }
-        });
-
-    }
-    // Re-initialize if peer disconnects
-    socket.on('PEER_DISCONNECTED', () => {
-        console.log("peer disconnected");
-        initiator = false;
-        gotRemoteDesc = false;
-        gotLocalDescription = false;
-        remoteVideo.srcObject = null;
-        if (localConn !== {}) localConn.close();
-        localConn = {};
-        if (localMediaStream !== false) {
-            initVideoChat();
-        } else {
-            tryVideoChat();
+            started = false
+            gotRemoteDesc = false;
+            gotLocalDescription = false;
         }
 
-    });
+        const handlePing = () => {
+            if (started){
+                initSetup();
+            }
+            setupConnection();
+            socket.emit('RTC_MESSAGE', {msg: 'pong'});
+        }
 
-    // First we setup our own connection & video stream
+        // Dispatches actions depending on message type
+        const rtcMessageHandler = data => {
+            //console.log(data);
+            switch(data.msg){
+                case 'ping':
+                    handlePing();
+                    break;
+                case 'pong':
+                    setupConnection()
+                    handleVideoInit();
+                    break;
+                case 'iceCandidate':
+                    handleRemoteIceCandidate(data);
+                    break;
+                case 'rtcOffer':
+                    handleOffer(data);
+                    break;
+                case 'rtcResponse':
+                if (!gotRemoteDesc && localConn !== {}) {
+                    localConn.setRemoteDescription(new RTCSessionDescription(data.response));
+                    gotRemoteDesc = true;
+                }
+                    break;
+                default:
+                    return;
+            }
+        }
+
+        // Setup the list of events we expect to receive
+        socket.on('RTC_MESSAGE', (data) =>{
+            rtcMessageHandler(data);
+        });
+
+        socket.on('CANDIDATE_WEB_RTC', handleRemoteIceCandidate);
+        socket.on('OFFER_WEB_RTC', handleOffer);
+        socket.on('RESPONSE_WEB_RTC', remoteDesc => {
+            //console.log('got response');
+            if (!gotRemoteDesc && localConn !== {}) {
+                localConn.setRemoteDescription(new RTCSessionDescription(remoteDesc));
+                gotRemoteDesc = true;
+            }
+        });
+        
+        // First tell the peer that we are ready
+        socket.emit('RTC_MESSAGE', {msg: 'ping'});
+    }
+
     tryVideoChat();
-
-
-
 
 };
 
-export default webRTC;
+export const changeWebRTC = (type, value) => {
+    if (localMediaStream !== false){
+        if (type === 'video'){
+            localMediaStream.getVideoTracks()[0].enabled = value;
+        } else if (type === 'audio'){
+            localMediaStream.getAudioTracks()[0].enabled = value;
+        }
+    }
+}
 
 // Config with Google servers
 

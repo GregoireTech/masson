@@ -5,7 +5,7 @@ import queryString from 'query-string';
 import endpoints from '../../assets/config/endpoints.js';
 // Scripts
 import boardScript from '../../assets/scripts/board/board';
-import webRTC from '../../assets/scripts/webRTC';
+import { setupWebRTC, changeWebRTC } from '../../assets/scripts/webRTC';
 import fileShare from '../../assets/scripts/fileShare';
 // React components
 import Tools from '../../components/tools/tools';
@@ -41,7 +41,7 @@ class Room extends Component {
         const pin = params.pin;
         //Connect to room
         const io = require('socket.io-client');
-        const socket = io(`${endpoints.prod}boards`);
+        const socket = io(`${endpoints.dev}boards`);
         
         // Send join request
         if (socket && boardId) {
@@ -55,7 +55,7 @@ class Room extends Component {
                     socket: socket
                 });
                 boardScript(socket, this.state.boardId);
-                webRTC(socket, data.boardReady, data.iceServers, {audio: this.state.audio, video: this.state.video});
+                setupWebRTC(socket, data.iceServers, {audio: this.state.audio, video: this.state.video});
                 fileShare(socket, this.onDownloadComplete.bind(this));
                 
             });
@@ -150,11 +150,13 @@ class Room extends Component {
     onToggleAudio(){
         const newOption = !this.state.audio;
         this.setState({audio: newOption});
+        changeWebRTC('audio', newOption);
     }
 
     onToggleVideo(){
         const newOption = !this.state.video;
         this.setState({video: newOption});
+        changeWebRTC('video', newOption);
     }
 
 

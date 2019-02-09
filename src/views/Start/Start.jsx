@@ -27,7 +27,7 @@ class Start extends Component {
             password: params.password
         }
             const io = require('socket.io-client');
-            const socket = io(`${endpoints.prod}`);
+            const socket = io(`${endpoints.dev}`);
             login(
                 {
                     addBoard: this.addBoardToList.bind(this), 
