@@ -10,9 +10,9 @@ class Start extends Component {
     state = {
         socket: null,
         userData: {        
-            firstName: 'Grégoire',
-            lastName: 'LeBeauGosse',
-            uid: 'gregocl',
+            firstName: 'Jean',
+            lastName: 'Dupont',
+            uid: 'jdpt777',
             password: '333888'
         },
         boardList: []
@@ -27,7 +27,7 @@ class Start extends Component {
             password: params.password
         }
             const io = require('socket.io-client');
-            const socket = io(`${endpoints.dev}`);
+            const socket = io(`${endpoints.prod}`);
             login(
                 {
                     addBoard: this.addBoardToList.bind(this), 

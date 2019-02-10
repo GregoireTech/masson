@@ -34,7 +34,8 @@ class Room extends Component {
         receivedFile: null,
         help: false,
         audio: true,
-        video: true
+        video: true,
+        teacher: false
     }
     
     componentDidMount() {
@@ -42,9 +43,10 @@ class Room extends Component {
         const params = queryString.parse(window.location.search);
         const boardId = params.id;
         const pin = params.pin;
+        const teacher = params.tch;
         //Connect to room
         const io = require('socket.io-client');
-        const socket = io(`${endpoints.dev}boards`);
+        const socket = io(`${endpoints.prod}boards`);
         
         // Send join request
         if (socket && boardId) {
@@ -55,7 +57,8 @@ class Room extends Component {
                     boardId: boardId,
                     pin: pin,
                     loaded: true,
-                    socket: socket
+                    socket: socket,
+                    teacher: teacher
                 });
                 boardScript(socket, this.state.boardId);
                 setupWebRTC(socket, data.iceServers, {audio: this.state.audio, video: this.state.video});
@@ -203,8 +206,7 @@ class Room extends Component {
                     {board}
                 </div>
                 <Controls 
-                    teacher={this.teacher} 
-                    student={this.student} 
+                    teacher={this.state.teacher}
                     openModal={this.toggleModal.bind(this)}
                     toggleHelp={this.toggleHelp.bind(this)}
                     audio={this.state.audio}

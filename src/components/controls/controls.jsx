@@ -1,4 +1,6 @@
 import React from 'react';
+
+//import downloadBoard from '../../helpers/downloadAsPdf';
 import './controls.css'
 
 
@@ -8,7 +10,7 @@ const controls = (props) => {
     let remoteBig = false;
     let localBig = false;
     let containerBig = false;
-    let gridStart, remoteGridStart, localGridStart;
+    let gridStart, remoteGridStart, localGridStart, controlsList1;
     const controlsContainer = document.getElementById('controlsContainer');
     const localVideo = document.getElementById('localVideo');
     const remoteVideo = document.getElementById('remoteVideo');
@@ -45,7 +47,7 @@ const controls = (props) => {
 
     }
 
-    const controlsList1 = [
+    const controlsListTeacher = [
         { 
             link : 'invite',
             name: 'Inviter',
@@ -54,6 +56,8 @@ const controls = (props) => {
         { 
             link : 'download',
             name: 'Télécharger'
+            //, click: downloadBoard
+
         },
         { 
             link : 'file',
@@ -65,6 +69,24 @@ const controls = (props) => {
             click: props.toggleHelp
         }
     ];
+    const controlsListStudent = [
+        { 
+            link : 'download',
+            name: 'Télécharger'
+            //, click: downloadBoard
+
+        },
+        { 
+            link : 'file',
+            name: 'Fichier'
+        },
+        { 
+            link : 'info',
+            name: 'Aide',
+            click: props.toggleHelp
+        }
+    ];
+
     const controlsList2 = [
         { 
             link : 'mic',
@@ -128,6 +150,7 @@ const controls = (props) => {
                 );        
         });
     }
+    props.teacher? controlsList1 = controlsListTeacher : controlsList1 = controlsListStudent
     let controlItems1 = dispatchControls(controlsList1);
     let controlItems2 = dispatchVideoControls(controlsList2);
     

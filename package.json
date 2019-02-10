@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "html2canvas": "^1.0.0-alpha.12",
+    "jspdf": "^1.5.3",
     "query-string": "^6.2.0",
     "react": "^16.7.0",
     "react-color": "^2.17.0",

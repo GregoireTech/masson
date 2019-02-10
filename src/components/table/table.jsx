@@ -30,7 +30,7 @@ const table = (props) => {
                 return (
                     <div className="tableItem" key={index} >
                         <p className='roomName'>{itemText}
-                            <Link to={`/boards/?${board.string}`} >
+                            <Link to={`/boards/?tch=true&&${board.string}`} >
                                 <span className='link joinLink'>Rejoindre</span>
                             </Link>
                         </p>
