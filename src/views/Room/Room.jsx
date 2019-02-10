@@ -7,6 +7,8 @@ import endpoints from '../../assets/config/endpoints.js';
 import boardScript from '../../assets/scripts/board/board';
 import { setupWebRTC, changeWebRTC } from '../../assets/scripts/webRTC';
 import fileShare from '../../assets/scripts/fileShare';
+// Helpers
+import validateEmail from '../../helpers/validateEmail';
 // React components
 import Tools from '../../components/tools/tools';
 import Controls from '../../components/controls/controls';
@@ -26,6 +28,7 @@ class Room extends Component {
         pin: null,
         socket: null,
         guest: null,
+        validEmail: false,
         modal: false,
         initiator: null,
         receivedFile: null,
@@ -47,7 +50,7 @@ class Room extends Component {
         if (socket && boardId) {
             // Setup actions if join succeeds OK
             socket.on('joinSuccess', (data) => {
-                console.log('joinSuccess');
+                //console.log('joinSuccess');
                 this.setState({
                     boardId: boardId,
                     pin: pin,
@@ -64,7 +67,7 @@ class Room extends Component {
             });
             // Setup actions if join fails
             
-            console.log('sending join request');
+            //console.log('sending join request');
             socket.emit('join', {id: boardId, pin: pin});
             socket.on('fileTransferRequest', data => {
                 //console.log('fileTransferRequest');
@@ -77,7 +80,7 @@ class Room extends Component {
                 this.setState({receivedFile: file});
             });
             socket.on('message', (data) => {
-                console.log(data.msg);
+                //console.log(data.msg);
                 alert(data.msg);
             });
         };
@@ -97,22 +100,22 @@ class Room extends Component {
 
     sendInvite(){
         const guest = this.state.guest;
-        console.log(guest);
         const socket = this.state.socket;
-        if(guest && socket){
-        socket.emit('inviteGuest', {email: guest});
-        socket.on('inviteRes', (res) => {
-            console.log('email response:', res);
-        });
+        if(this.state.validEmail && socket){
+            socket.emit('inviteGuest', {
+                email: guest,
+                boardId: this.state.boardId
+            });
+            this.setState({modal: false});
         } else { 
             alert('Il y a eu une erreur, merci de réessayer');
         }
-        this.setState({modal: false});
     };
 
     guestInputChanged(e){
         const email = e.target.value;
-        this.setState({guest: email});
+        const valid = validateEmail(email);
+        this.setState({guest: email, validEmail: valid});
     }
 
     toggleModal(){

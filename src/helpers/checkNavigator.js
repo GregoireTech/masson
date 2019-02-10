@@ -1,5 +1,4 @@
 const checkNavigator = () => {
-
     let navName;
     if ((window.navigator.userAgent.indexOf("Opera") || window.navigator.userAgent.indexOf('OPR')) !== -1) {
         navName = 'Opera';
@@ -11,12 +10,13 @@ const checkNavigator = () => {
         navName = 'Firefox';
     } else if ((window.navigator.userAgent.indexOf("MSIE") !== -1) || (!!document.documentMode === true)){
         navName = 'IE';
-    } else if ((window.navigator.userAgent.indexOf("Edge") !== -1) || (!!document.documentMode === true)){
-        navName = 'Edge';
+        alert("Votre navigateur n'est pas compatible, merci d'utiliser Chrome ou Safari.")
     } else {
         navName = 'unknown';
     }
-    console.log(navName)
+    if (/Edge/.test(navigator.userAgent)) {
+        navName = 'Edge';
+    }
     return (navName === 'Chrome' || navName === 'Safari');
 }
 
